@@ -1,7 +1,7 @@
 {
   "name": "Finance",
   "short_name": "Finance",
-  "start_url": "/",
+  "start_url": "/finance",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
