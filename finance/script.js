@@ -5,11 +5,8 @@ import {
 import {
   getAuth,
   onAuthStateChanged,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
   sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import {
@@ -22,8 +19,7 @@ import {
   orderBy,
   getDocs,
   writeBatch,
-  runTransaction,
-  setDoc
+  runTransaction
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -40,8 +36,11 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Single User Configuration
+const APP_EMAIL = "bhaskarjyoticlub@gmail.com";
+
 // --- Global State ---
-let currentUser = null, activeProjectId = null, projects = [], projectsUnsubscribe = null, expensesUnsubscribe = null, allExpensesForProject = [], isSigningUp = false;
+let currentUser = null, activeProjectId = null, projects = [], projectsUnsubscribe = null, expensesUnsubscribe = null, allExpensesForProject = [];
 let showAllExpenses = false; // Added state for View All feature
 
 // --- DOM Elements ---
@@ -53,7 +52,6 @@ const views = {
 const userNameDisplay = document.getElementById('user-display-name');
 const authTitle = document.getElementById('auth-title');
 const emailForm = document.getElementById('email-form');
-const emailInput = document.getElementById('email-input');
 const passwordInput = document.getElementById('password-input');
 const emailActionBtn = document.getElementById('email-action-btn');
 const btnText = document.getElementById('btn-text');
@@ -62,7 +60,6 @@ const togglePasswordBtn = document.getElementById('toggle-password-btn');
 const eyeIcon = document.getElementById('eye-icon');
 const eyeSlashIcon = document.getElementById('eye-slash-icon');
 const forgotPasswordLink = document.getElementById('forgot-password-link');
-const googleSignInBtn = document.getElementById('google-signin-btn');
 
 const expenseDashboard = document.getElementById('expense-dashboard'), noProjectMessage = document.getElementById('no-project-message'), expenseForm = document.getElementById('expense-form'), expenseList = document.getElementById('expense-list'), finalExpensesEl = document.getElementById('final-expenses');
 const userProfileDesktop = document.getElementById('user-profile-desktop'), userProfileMobile = document.getElementById('user-profile-mobile');
@@ -84,7 +81,6 @@ const additionalInfo = document.getElementById('additional-info');
 const editPaymentStatus = document.getElementById('edit-payment-status');
 const editAddress = document.getElementById('edit-address');
 const editAdditionalInfo = document.getElementById('edit-additional-info');
-
 
 // --- Custom Native-Feel Toast Notification ---
 function showToast(message, type = 'error') {
@@ -124,15 +120,12 @@ function showToast(message, type = 'error') {
 }
 
 // --- Custom Native-Feel Confirmation Modal ---
-// --- Custom Native-Feel Confirmation Modal ---
 function showConfirm(title, message) {
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
-    // Align to bottom using 'items-end'
     overlay.className = 'fixed inset-0 bg-transparent backdrop-blur-sm z-[100] flex items-end justify-center opacity-0 transition-opacity duration-300';
 
     const modal = document.createElement('div');
-    // Bottom-sheet styling: rounded-t-3xl, w-full, border-t, pb-12, and initial state translate-y-full (pushed off screen)
     modal.className = 'bg-white p-6 pb-12 border-t-2 border-red-200 s rounded-t-3xl shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.15)] w-full md:max-w-md text-left transform translate-y-full transition-transform duration-300';
 
     modal.innerHTML = `
@@ -153,30 +146,24 @@ function showConfirm(title, message) {
 
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
-
-    // Lock scroll
     document.body.classList.add('overflow-hidden');
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         overlay.classList.remove('opacity-0');
-        // Remove translate-y-full to trigger the slide-up animation
         modal.classList.remove('translate-y-full');
       });
     });
 
     const closeAndResolve = (result) => {
       overlay.classList.add('opacity-0');
-      // Add translate-y-full back to trigger the slide-down animation
       modal.classList.add('translate-y-full');
-
-      // Unlock scroll
       document.body.classList.remove('overflow-hidden');
 
       setTimeout(() => {
         overlay.remove();
         resolve(result);
-      }, 300); // Matches the duration-300 Tailwind class
+      }, 300);
     };
 
     modal.querySelector('#confirm-cancel-btn').addEventListener('click', () => closeAndResolve(false));
@@ -184,14 +171,12 @@ function showConfirm(title, message) {
   });
 }
 
-
 // --- View Management ---
 const showView = (viewName) => {
   Object.values(views).forEach(v => v?.classList.remove('active'));
   if (views[viewName]) views[viewName].classList.add('active');
 };
 
-// Explicitly show the splash screen on initial load to prevent FOUC (Flash of Unstyled Content/Auth screen)
 showView('splash');
 
 // --- Authentication ---
@@ -215,34 +200,27 @@ onAuthStateChanged(auth, user => {
 
   if (isInitialLoad) {
     isInitialLoad = false;
-    // Delay routing for 1 second just so the splash screen transition looks smooth on fast connections
     setTimeout(routeUser, 1000);
   } else {
-    // Immediate routing for subsequent logouts/logins
     routeUser();
   }
 });
 
-// Helper functions for password input visuals
 function setInputStatus(status) {
   if (!passwordInput) return;
 
-  // Clear previous status classes
   passwordInput.classList.remove('border-red-500', 'ring-1', 'ring-red-500', 'border-green-500', 'ring-green-500', 'focus:ring-indigo-500', 'border-slate-200', 'focus:border-indigo-500');
 
   if (status === 'error') {
     passwordInput.classList.add('border-red-500', 'ring-1', 'ring-red-500');
-    // Vibrate device (supported on most modern Android devices)
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
   } else if (status === 'success') {
     passwordInput.classList.add('border-green-500', 'ring-1', 'ring-green-500');
   } else {
-    // Reset to default
     passwordInput.classList.add('border-slate-200', 'focus:ring-indigo-500', 'focus:border-indigo-500');
   }
 }
 
-// Manage UI state of the Submit button
 function setAuthButtonLoading(isLoading) {
   if (!emailActionBtn || !btnText || !btnSpinner) return;
 
@@ -257,12 +235,10 @@ function setAuthButtonLoading(isLoading) {
   }
 }
 
-// Resets border visuals when typing
 passwordInput?.addEventListener('input', () => {
   setInputStatus('default');
 });
 
-// Password Visibility Toggle Logic
 togglePasswordBtn?.addEventListener('click', () => {
   if (!passwordInput || !eyeIcon || !eyeSlashIcon) return;
 
@@ -286,7 +262,6 @@ emailForm?.addEventListener('submit', async e => {
     return;
   }
 
-  const email = emailInput.value.trim();
   const password = passwordInput.value;
 
   if (!password) {
@@ -298,99 +273,49 @@ emailForm?.addEventListener('submit', async e => {
   setAuthButtonLoading(true);
 
   try {
-    // 2. Attempt to log in first
-    await signInWithEmailAndPassword(auth, email, password);
-
+    await signInWithEmailAndPassword(auth, APP_EMAIL, password);
     setInputStatus('success');
     showToast("Login successful!", "success");
-    setAuthButtonLoading(false); // Reset on success just in case
-
+    setAuthButtonLoading(false);
   } catch (loginError) {
-    // 3. If login fails, try creating a new account
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    setInputStatus('error');
+    setAuthButtonLoading(false);
 
-      // Add profile to the users collection for the Admin Panel
-      const appId = "construction-expenses";
-      await setDoc(doc(db, `artifacts/${appId}/users`, userCredential.user.uid), {
-        email: email,
-        status: "active",
-        createdAt: new Date().toISOString()
-      });
+    let friendlyMessage = "Something went wrong. Please try again.";
+    const errCode = loginError.code;
 
-      setInputStatus('success');
-      showToast("Account created successfully!", "success");
-      setAuthButtonLoading(false);
-
-    } catch (signupError) {
-      setInputStatus('error');
-      setAuthButtonLoading(false);
-
-      // 4. Transform Firebase Error codes into normal language Toast alerts
-      let friendlyMessage = "Something went wrong. Please try again.";
-      const errCode = signupError.code || loginError.code;
-
-      switch (errCode) {
-        case 'auth/email-already-in-use':
-          friendlyMessage = "Incorrect password for this email.";
-          break;
-        case 'auth/invalid-credential':
-        case 'auth/wrong-password':
-          friendlyMessage = "Incorrect email or password.";
-          break;
-        case 'auth/invalid-email':
-          friendlyMessage = "Please enter a valid email address.";
-          break;
-        case 'auth/weak-password':
-          friendlyMessage = "Password should be at least 6 characters.";
-          break;
-        case 'auth/network-request-failed':
-          friendlyMessage = "Network error. Please check your connection.";
-          break;
-        case 'auth/too-many-requests':
-          friendlyMessage = "Too many failed attempts. Try again later.";
-          break;
-      }
-
-      showToast(friendlyMessage, 'error');
+    switch (errCode) {
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+        friendlyMessage = "Incorrect password.";
+        break;
+      case 'auth/network-request-failed':
+        friendlyMessage = "Network error. Please check your connection.";
+        break;
+      case 'auth/too-many-requests':
+        friendlyMessage = "Too many failed attempts. Try again later.";
+        break;
     }
+    showToast(friendlyMessage, 'error');
   }
-});
-
-googleSignInBtn?.addEventListener('click', () => {
-  if (!navigator.onLine) {
-    showToast("Please connect to internet", "error");
-    return;
-  }
-  signInWithPopup(auth, new GoogleAuthProvider()).catch(() => {
-    showToast("Google Sign-In failed or was cancelled.", "error");
-  });
 });
 
 forgotPasswordLink?.addEventListener('click', async e => {
   e.preventDefault();
-  const email = emailInput.value;
-  if (!email) {
-    showToast('Please enter your email address first.', 'error');
-    return;
-  }
   try {
-    await sendPasswordResetEmail(auth, email);
-    showToast('Password reset email sent!', 'success');
+    await sendPasswordResetEmail(auth, APP_EMAIL);
+    showToast('Password reset email sent to admin!', 'success');
   } catch (error) {
-    let msg = "Failed to send reset email.";
-    if (error.code === 'auth/invalid-email') msg = "Please enter a valid email.";
-    if (error.code === 'auth/user-not-found') msg = "No account found with this email.";
-    showToast(msg, 'error');
+    showToast("Failed to send reset email.", 'error');
   }
 });
 
 // --- UI Setup & Mobile Menu ---
 function setupUIForUser(user) {
-  const photo = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'U')}&background=E2E8F0&color=4A5568`;
+  const photo = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent('Admin')}&background=E2E8F0&color=4A5568`;
 
   if (userProfileDesktop) userProfileDesktop.innerHTML = `<div class="w-10 h-10 rounded-full overflow-hidden"><img src="${photo}" alt="User photo" class="w-full h-full object-cover"></div>`;
-  if (userProfileMobile) userProfileMobile.innerHTML = `<div class="flex items-center"><div class="w-12 h-12 rounded-full overflow-hidden mr-3"><img src="${photo}" alt="User photo" class="w-full h-full object-cover"></div><div><p class="font-semibold">${escapeHTML(user.displayName || 'User')}</p><p class="text-xs text-gray-500 truncate">${escapeHTML(user.email)}</p></div></div>`;
+  if (userProfileMobile) userProfileMobile.innerHTML = `<div class="flex items-center"><div class="w-12 h-12 rounded-full overflow-hidden mr-3"><img src="${photo}" alt="User photo" class="w-full h-full object-cover"></div><div><p class="font-semibold">Admin Account</p><p class="text-xs text-gray-500 truncate">${escapeHTML(user.email)}</p></div></div>`;
 
   if (navigator.onLine) {
     updateStatusUI('welcome');
@@ -405,12 +330,12 @@ function setupUIForUser(user) {
 const openMenu = () => {
   mobileMenuBackdrop?.classList.remove('pointer-events-none', 'opacity-0');
   mobileMenu?.classList.remove('-translate-x-full');
-  document.body.classList.add('overflow-hidden'); // Lock scroll
+  document.body.classList.add('overflow-hidden');
 };
 const closeMenu = () => {
   mobileMenuBackdrop?.classList.add('pointer-events-none', 'opacity-0');
   mobileMenu?.classList.add('-translate-x-full');
-  document.body.classList.remove('overflow-hidden'); // Unlock scroll
+  document.body.classList.remove('overflow-hidden'); 
 };
 hamburgerBtn?.addEventListener('click', openMenu);
 closeMenuBtn?.addEventListener('click', closeMenu);
@@ -444,7 +369,6 @@ function listenForProjects(uid) {
     }
     populateSidebarProjects(projects);
 
-    // Load saved project ID if available
     const savedProjectId = localStorage.getItem('lastActiveProjectId');
 
     if (savedProjectId && projects.find(p => p.id === savedProjectId)) {
@@ -469,16 +393,9 @@ listenForExpenses(currentUser.uid, activeProjectId);
 }
 
 sidebarAddProjectBtn?.addEventListener('click', (e) => {
-// 1. Stop the page from jumping to the top
 e.preventDefault();
-
-// 2. Open the modal
 addProjectModal.classList.remove('hidden');
-
-// 3. Lock the background scroll for the modal
 document.body.classList.add('overflow-hidden');
-
-// 4. Focus the input, but explicitly tell the browser NOT to scroll the page
 setTimeout(() => {
 document.getElementById('new-project-name-modal');
 }, 100);
@@ -503,7 +420,7 @@ name: projectName
 });
 addProjectFormModal.reset();
 addProjectModal.classList.add('hidden');
-document.body.classList.remove('overflow-hidden'); // Unlock scroll
+document.body.classList.remove('overflow-hidden'); 
 
 showToast(`Project "${projectName}" created!`, "success");
 
@@ -526,10 +443,8 @@ document.querySelectorAll('.sidebar-project-link').forEach(link => link.addEvent
 e.preventDefault();
 activeProjectId = e.target.dataset.projectId;
 
-// Save the selected project to local storage
 localStorage.setItem('lastActiveProjectId', activeProjectId);
 
-// Reset view all state when changing projects
 showAllExpenses = false;
 if (viewAllBtn) viewAllBtn.style.display = 'block';
 
@@ -558,7 +473,6 @@ if (noProjectMessage) noProjectMessage.style.display = hasProjects ? 'none': 'bl
 viewAllBtn?.addEventListener('click', () => {
 showAllExpenses = true;
 applyFilters();
-// Optional: Hide the button once activated
 if (viewAllBtn) viewAllBtn.style.display = 'none';
 });
 
@@ -603,11 +517,9 @@ filtered = allExpensesForProject.filter(exp =>
 (!endDate || exp.date <= endDate)
 );
 } else {
-// Rely on new View All State
 filtered = showAllExpenses ? allExpensesForProject: allExpensesForProject.slice(0, 5);
 }
 
-// Hide or show the View All button based on list length
 if (!isFiltering && !showAllExpenses && allExpensesForProject.length > 5) {
 if (viewAllBtn) viewAllBtn.style.display = 'block';
 } else {
@@ -619,7 +531,6 @@ renderExpenses(filtered);
 
 [searchInput, startDateInput, endDateInput].forEach(el => el?.addEventListener('input', applyFilters));
 
-// Helper function to format dates as YYYY-MM-DD (required for standard date inputs)
 const formatDate = (date) => {
 const year = date.getFullYear();
 const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -627,12 +538,10 @@ const day = String(date.getDate()).padStart(2, '0');
 return `${year}-${month}-${day}`;
 };
 
-// Function to calculate and set the date range
 const setDateFilter = (timeframe) => {
 const endDate = new Date();
 const startDate = new Date();
 
-// Adjust the start date based on the clicked button
 switch (timeframe) {
 case 'last-week':
 startDate.setDate(startDate.getDate() - 7);
@@ -645,25 +554,19 @@ startDate.setFullYear(startDate.getFullYear() - 1);
 break;
 }
 
-// Update the input fields so the user sees the active date range
 if (startDateInput) startDateInput.value = formatDate(startDate);
 if (endDateInput) endDateInput.value = formatDate(endDate);
 
-// Trigger your existing filter function
 applyFilters();
 };
 
-// Grab the buttons from the DOM
 const btnLastWeek = document.getElementById('last-week');
 const btnLastMonth = document.getElementById('last-month');
 const btnLastYear = document.getElementById('last-year');
 
-// Attach click event listeners
 btnLastWeek?.addEventListener('click', () => setDateFilter('last-week'));
 btnLastMonth?.addEventListener('click', () => setDateFilter('last-month'));
 btnLastYear?.addEventListener('click', () => setDateFilter('last-year'));
-
-
 
 
 expenseForm?.addEventListener('submit', async e => {
@@ -773,7 +676,7 @@ editAddress.value = expense.address || '';
 editAdditionalInfo.value = expense.additionalInfo || '';
 
 editModal.classList.remove('hidden');
-document.body.classList.add('overflow-hidden'); // Lock scroll
+document.body.classList.add('overflow-hidden'); 
 }
 
 editExpenseForm?.addEventListener('submit', async e => {
@@ -813,7 +716,7 @@ document.getElementById('edit-project-id').value = projectId;
 document.getElementById('edit-project-name').value = projectName;
 
 editProjectModal.classList.remove('hidden');
-document.body.classList.add('overflow-hidden'); // Lock scroll
+document.body.classList.add('overflow-hidden');
 }
 
 async function handleDeleteProject(e) {
@@ -845,7 +748,6 @@ await batch.commit();
 
 showToast("Project deleted", "success");
 
-// Handle updating or clearing active project info when deleted
 if (activeProjectId === projectId) {
 const generalProject = projects.find(p => p.name === 'General') || projects[0];
 if (generalProject) {
@@ -890,11 +792,10 @@ showToast("Rename failed.", "error");
 }
 });
 
-
 // --- Modal Closers ---
 const closeEditModal = () => {
 editModal?.classList.add('hidden');
-document.body.classList.remove('overflow-hidden'); // Unlock scroll
+document.body.classList.remove('overflow-hidden'); 
 };
 cancelEditBtn?.addEventListener('click', closeEditModal);
 editModal?.addEventListener('click', e => {
@@ -903,7 +804,7 @@ if (e.target === editModal) closeEditModal();
 
 const closeEditProjectModal = () => {
 editProjectModal?.classList.add('hidden');
-document.body.classList.remove('overflow-hidden'); // Unlock scroll
+document.body.classList.remove('overflow-hidden');
 };
 cancelEditProjectBtn?.addEventListener('click', closeEditProjectModal);
 editProjectModal?.addEventListener('click', e => {
@@ -912,7 +813,7 @@ if (e.target === editProjectModal) closeEditProjectModal();
 
 const closeAddProjectModal = () => {
 addProjectModal?.classList.add('hidden');
-document.body.classList.remove('overflow-hidden'); // Unlock scroll
+document.body.classList.remove('overflow-hidden');
 };
 cancelAddProjectBtn?.addEventListener('click', closeAddProjectModal);
 addProjectModal?.addEventListener('click', e => {
@@ -984,18 +885,12 @@ support@bhaskarjyoticlub.web.app
 };
 
 
-// Select all buttons with the 'nav-btn' class
 const navButtons = document.querySelectorAll('.nav-btn');
 
 navButtons.forEach(button => {
 button.addEventListener('click', (e) => {
-// Get the ID of the clicked button (e.g., 'about-link')
 const linkId = e.target.id;
-
-// Look up the corresponding data in the object
 const sectionData = infoContent[linkId];
-
-// If data exists, update the DOM
 if (sectionData) {
 document.getElementById('display-title').innerHTML = sectionData.title;
 document.getElementById('display-content').innerHTML = sectionData.content;
@@ -1016,13 +911,13 @@ if (infoModalTitle) infoModalTitle.textContent = title;
 if (infoModalContent) infoModalContent.innerHTML = content;
 
 infoModal?.classList.remove('hidden');
-document.body.classList.add('overflow-hidden'); // Lock scroll
+document.body.classList.add('overflow-hidden');
 });
 });
 
 const closeInfoModal = () => {
 infoModal?.classList.add('hidden');
-document.body.classList.remove('overflow-hidden'); // Unlock scroll
+document.body.classList.remove('overflow-hidden'); 
 };
 
 closeInfoModalBtn?.addEventListener('click', closeInfoModal);
@@ -1052,11 +947,11 @@ return acc;
 
 const sorted = Object.keys(materialTotals).sort((a, b) => materialTotals[b] - materialTotals[a]);
 if (sorted.length === 0) {
-if (materialSummaryEl) materialSummaryEl.innerHTML = `<p class="text-gray-500">No expenses to summarize.</p>`;
+if (typeof materialSummaryEl !== 'undefined' && materialSummaryEl) materialSummaryEl.innerHTML = `<p class="text-gray-500">No expenses to summarize.</p>`;
 return;
 }
 
-if (materialSummaryEl) {
+if (typeof materialSummaryEl !== 'undefined' && materialSummaryEl) {
 materialSummaryEl.innerHTML = sorted.map(key => {
 const total = materialTotals[key];
 const displayName = key.charAt(0).toUpperCase() + key.slice(1);
@@ -1073,7 +968,7 @@ const div = document.createElement('div'); div.appendChild(document.createTextNo
 
 // --- Admin Configuration Listener ---
 let globalConfigUnsubscribe = null;
-const ADMIN_EMAILS = ["roni9101862699@gmail.com"]; // REPLACE WITH YOUR ADMIN EMAIL
+const ADMIN_EMAILS = [APP_EMAIL]; 
 
 function listenForAppConfig() {
 if (globalConfigUnsubscribe) return;
@@ -1182,8 +1077,7 @@ userStatusDisplay.innerHTML = `
 statusTimeout = setTimeout(() => updateStatusUI('welcome'), 5000);
 
 } else if (state === 'welcome') {
-const name = currentUser?.displayName || 'User';
-userStatusDisplay.innerHTML = `<span class="text-sm text-gray-700">Welcome, <strong>${escapeHTML(name)}</strong></span>`;
+userStatusDisplay.innerHTML = `<span class="text-sm text-gray-700">Welcome back, <strong>Admin</strong></span>`;
 }
 
 userStatusDisplay.classList.remove('opacity-0');
@@ -1212,14 +1106,11 @@ window.location.href = `analytics.html?projectId=${activeProjectId}`;
 document.addEventListener('DOMContentLoaded', () => {
 const shareButton = document.getElementById('shareFinTrackBtn');
 
-// Your requested text
 const finTrackShareText = "I’ve been using to manage my expenses and get clear insights into my spending.\nIt’s simple, effective, and actually helps me stay on top of my finances. \n\nYou should give it a try 👍";
 
-// The URL of your app (Optional: you can change this to your actual GitHub Pages/Firebase URL)
 const appUrl = window.location.origin;
 
-shareButton.addEventListener('click', async () => {
-// Check if the browser supports the native Web Share API
+shareButton?.addEventListener('click', async () => {
 if (navigator.share) {
 try {
 await navigator.share({
@@ -1232,11 +1123,9 @@ console.log('Successfully shared');
 console.error('Error sharing:', error);
 }
 } else {
-// Fallback for browsers that don't support Web Share API (copies to clipboard)
 const fullTextToCopy = `${finTrackShareText}${appUrl}`;
 
 navigator.clipboard.writeText(fullTextToCopy).then(() => {
-// You can replace this alert with a nicer toast notification in your app
 alert("Share message copied to clipboard!");
 }).catch(err => {
 console.error("Failed to copy text: ", err);
@@ -1244,8 +1133,6 @@ console.error("Failed to copy text: ", err);
 }
 });
 });
-
-
 
 // App configuration
 const APP_VERSION = "1.2";
