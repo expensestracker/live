@@ -91,6 +91,16 @@
       font-family: inherit;
       margin-bottom: 10px;
     }
+    
+    /* Override global input style for the toggle */
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+      margin-bottom: 0;
+      cursor: pointer;
+    }
+
     label {
       display: block;
       font-size: 14px;
@@ -99,6 +109,17 @@
       margin-bottom: 5px;
       text-transform: capitalize;
     }
+
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--text);
+      text-transform: none;
+    }
+
     button {
       background: var(--surface);
       color: var(--text);
@@ -223,6 +244,14 @@
             <button class="btn-fx" style="background: var(--danger);" onclick="triggerEffect('OUT')">Out</button>
           </div>
         </div>
+
+        <div style="margin-top:20px; padding-top: 15px; border-top: 1px solid var(--border);">
+          <label>Visual Effects</label>
+          <label class="toggle-wrapper">
+            <input type="checkbox" id="particleToggle">
+            Show Background Particles
+          </label>
+        </div>
       </div>
     </div>
   </div>
@@ -282,7 +311,8 @@
       brandLogo: "",
       customTitle: "",
       customText: "",
-      customImg: ""
+      customImg: "",
+      showParticles: false // Added particles state
     };
 
     let isConnected = false;
@@ -374,6 +404,10 @@
       safeUpdate('brandTitle', state.brandTitle); safeUpdate('brandSub', state.brandSub); safeUpdate('brandLogo', state.brandLogo);
       safeUpdate('customTitle', state.customTitle); safeUpdate('customText', state.customText); safeUpdate('customImg', state.customImg);
 
+      // Added Particle Toggle UI update
+      const particleToggle = document.getElementById('particleToggle');
+      if(particleToggle) particleToggle.checked = !!state.showParticles;
+
       document.querySelectorAll('.scene-btn').forEach(btn => btn.classList.remove('active'));
       const activeBtn = document.getElementById('btn-scene-' + (state.activeScene || 'live'));
       if (activeBtn) activeBtn.classList.add('active');
@@ -389,6 +423,10 @@
       state.customTitle = document.getElementById('customTitle')?.value || state.customTitle;
       state.customText = document.getElementById('customText')?.value || state.customText;
       state.customImg = document.getElementById('customImg')?.value || state.customImg;
+      
+      // Added particles state update
+      state.showParticles = document.getElementById('particleToggle')?.checked || false;
+      
       state.lastUpdated = Date.now();
 
       updateUI();
@@ -413,7 +451,14 @@
         if (snapshot.exists()) {
           const firebaseState = snapshot.val();
           if (!state.lastUpdated || (firebaseState.lastUpdated > state.lastUpdated)) {
-            state = firebaseState; if (!state.thisOver) state.thisOver = []; if (!state.history) state.history = []; updateUI();
+            state = firebaseState; 
+            if (!state.thisOver) state.thisOver = []; 
+            if (!state.history) state.history = []; 
+            
+            // Added fallback logic for legacy data missing showParticles
+            if (state.showParticles === undefined) state.showParticles = false; 
+            
+            updateUI();
           } else if (state.lastUpdated > firebaseState.lastUpdated) {
             set(matchRef, state);
           }

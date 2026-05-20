@@ -2,42 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Scoring Director</title>
   <style>
-:root {
-    --bg: #ffffff;
-    --surface: #f4f6f8;
-    --text: #1a1a1a;
-    --text-muted: #666;
-    --accent: #0f5bfa;
-    --danger: #dc3545;
-    --success: #28a745;
-    --border: #e0e0e0;
-    --warning: #ff9800;
-    --offline: #9e9e9e;
-  }
+    :root {
+      --bg: #ffffff;
+      --surface: #f4f6f8;
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --accent: #0f5bfa;
+      --danger: #dc3545;
+      --success: #28a745;
+      --border: #e0e0e0;
+      --warning: #ff9800;
+      --offline: #9e9e9e;
+      --desktop-bg: #e9ecef;
+    }
+    
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg);
+      background-color: var(--desktop-bg);
       color: var(--text);
       margin: 0;
-      padding: 15px;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 100vh;
+      min-height: 100dvh;
     }
+
     .app-container {
       width: 100%;
-      max-width: 500px;
+      max-width: 550px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
     }
+
     .panel {
       background: var(--bg);
       padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.01);
-      border: 1px solid var(--border);
+      border-radius: 0;
+      box-shadow: none;
+      border: none;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
     }
+
+    /* Desktop Responsive Constraints */
+    @media (min-width: 600px) {
+      body {
+        padding: 20px 0;
+        justify-content: center;
+      }
+      .app-container {
+        flex-grow: 0;
+      }
+      .panel {
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        border: 1px solid var(--border);
+        flex-grow: 0;
+      }
+    }
+
     .panel-title {
       font-size: 14px;
       font-weight: bold;
@@ -74,12 +104,8 @@
       animation: blink 1.2s infinite;
     }
     @keyframes blink {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.3;
-      }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
     input, select, textarea {
       width: 100%;
@@ -103,7 +129,7 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
     button {
       background: var(--surface);
@@ -115,6 +141,7 @@
       font-weight: bold;
       cursor: pointer;
       transition: 0.1s;
+      user-select: none;
     }
     button:active {
       transform: scale(0.95);
@@ -136,38 +163,79 @@
       background: #ffcdd2;
       color: #b71c1c;
       border-color: #b71c1c;
+      grid-column: span 2;
     }
+    
+    .history-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .btn-undo {
+      flex: 1;
+      background: #fff3e0;
+      color: #e65100;
+      border-color: #ffe0b2;
+    }
+    .btn-redo {
+      flex: 1;
+      background: #e8f5e9;
+      color: #1b5e20;
+      border-color: #c8e6c9;
+    }
+
     .mini-score {
-      text-align: center;
-      font-size: 28px;
-      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 10px;
-      background: var(--bg);
-      padding: 10px;
+      background: var(--surface);
+      padding: 10px 15px;
       border-radius: 8px;
     }
     .status-box {
-      font-size: 12px;
-      color: var(--accent);
+      font-size: 14px;
+      color: var(--text);
       font-weight: bold;
-      text-align: center;
+      text-align: left;
+      margin-bottom: 15px;
+      text-transform: capitalize;
+    }
+    .stat-card {
+      background: var(--surface);
+      padding: 10px;
+      border-radius: 8px;
       margin-bottom: 15px;
     }
     .this-over {
       display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 10px;
-      font-size: 12px;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 5px;
     }
     .ball {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      background: #ddd;
+      background: var(--border);
+      color: var(--text);
       display: flex;
       align-items: center;
       justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .ball.w {
+      background: var(--danger);
+      color: white;
+    }
+    .ball.four {
+      background: var(--accent);
+      color: white;
+    }
+    .ball.six {
+      background: var(--danger);
+      color: white;
     }
     .input-group {
       display: flex;
@@ -175,6 +243,13 @@
     }
     .input-group > div {
       flex: 1;
+    }
+
+    .bottom-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: auto; 
+      padding-top: 15px;
     }
   </style>
 </head>
@@ -206,28 +281,50 @@
       </div>
 
       <div class="mini-score">
-        <span id="displayScore">0</span>/<span id="displayWickets">0</span> (<span id="displayOvers">0.0</span>)
-        <div class="this-over" id="thisOverUI"></div>
+        <div style="font-size: 46px; font-weight: 900; line-height: 1; color: var(--danger);">
+          <span id="displayScore">0</span><span style="color: var(--text-muted); font-size: 30px;">/<span style="color: var(--text); font-size: 30px;" id="displayWickets">0</span></span>
+        </div>
+        <div style="font-size: 16px; color: var(--text-muted); font-weight: bold; text-align: right;">
+          Overs<br>
+          <span id="displayOvers" style="color: var(--text); font-size: 26px;">0.0</span> <span style="font-size: 16px;">/ <span id="displayMaxOvers">20</span></span>
+        </div>
       </div>
+
       <div class="status-box" id="matchStatusText">
         1st Innings
       </div>
-      <input type="hidden" id="statusBar"> <div class="keypad">
+      
+      <div class="stat-card">
+        <label>This over</label>
+        <div class="this-over" id="thisOverUI">
+          <div style="color: var(--text-muted); font-size: 13px;">Start of over...</div>
+        </div>
+      </div>
+
+      <input type="hidden" id="statusBar"> 
+      
+      <div class="keypad">
         <button onclick="addRun(0, '0')">0</button>
         <button onclick="addRun(1, '1')">1</button>
         <button onclick="addRun(2, '2')">2</button>
         <button onclick="addRun(3, '3')">3</button>
+        
         <button class="btn-4" onclick="addRun(4, '4')">4</button>
         <button class="btn-6" onclick="addRun(6, '6')">6</button>
         <button onclick="addExtra('WD', 1)">WD</button>
         <button onclick="addExtra('NB', 1)">NB</button>
+        
         <button onclick="addExtra('BYE', 0)">BYE</button>
         <button onclick="addExtra('LB', 0)">LB</button>
         <button class="btn-out" onclick="addWicket()">OUT</button>
-        <button onclick="undo()">Undo</button>
       </div>
 
-      <div style="display: flex; gap: 10px;">
+      <div class="history-controls">
+        <button class="btn-undo" onclick="undo()">⬅️ Undo</button>
+        <button class="btn-redo" onclick="redo()">Redo ➡️</button>
+      </div>
+
+      <div class="bottom-actions">
         <button style="flex: 1; background: var(--text); color: white;" onclick="switchInnings()">Switch Innings</button>
         <button style="flex: 0.5;" onclick="resetMatch()">Reset</button>
       </div>
@@ -266,6 +363,7 @@
     let state = {
       lastUpdated: Date.now(),
       history: [],
+      redoHistory: [],
       batTeam: "IND",
       bowlTeam: "AUS",
       runs: 0,
@@ -332,7 +430,6 @@
       isConnected = snap.val() === true; evaluateSystemStatus();
     });
 
-    // Sync state dynamically if broadcast panel updates
     onValue(matchRef, (snapshot) => {
       if (snapshot.exists()) {
         const dbState = snapshot.val();
@@ -344,17 +441,59 @@
 
     function saveState() {
       if (!state.history) state.history = [];
+      state.redoHistory = []; // Clear redo options on new actions
+      
       const stateClone = JSON.parse(JSON.stringify(state));
       delete stateClone.history;
+      delete stateClone.redoHistory;
+      
       state.history.push(stateClone);
       if (state.history.length > 40) state.history.shift();
     }
 
     window.undo = () => {
       if (state.history && state.history.length > 0) {
+        if (!state.redoHistory) state.redoHistory = [];
+        
+        // Push current state to redo
+        const stateClone = JSON.parse(JSON.stringify(state));
+        delete stateClone.history;
+        delete stateClone.redoHistory;
+        state.redoHistory.push(stateClone);
+
+        // Pop previous state
         const prevState = state.history.pop();
         const currentHistory = state.history;
-        state = prevState; state.history = currentHistory; syncToFirebase();
+        const currentRedoHistory = state.redoHistory;
+        
+        state = prevState;
+        state.history = currentHistory;
+        state.redoHistory = currentRedoHistory;
+        
+        syncToFirebase();
+      }
+    };
+
+    window.redo = () => {
+      if (state.redoHistory && state.redoHistory.length > 0) {
+        if (!state.history) state.history = [];
+        
+        // Push current state to history
+        const stateClone = JSON.parse(JSON.stringify(state));
+        delete stateClone.history;
+        delete stateClone.redoHistory;
+        state.history.push(stateClone);
+
+        // Pop next state from redo stack
+        const nextState = state.redoHistory.pop();
+        const currentHistory = state.history;
+        const currentRedoHistory = state.redoHistory;
+        
+        state = nextState;
+        state.history = currentHistory;
+        state.redoHistory = currentRedoHistory;
+        
+        syncToFirebase();
       }
     };
 
@@ -436,7 +575,7 @@
 
     window.resetMatch = () => {
       if (confirm("Reset entirely?")) {
-        state.history = []; state.runs = 0; state.wickets = 0; state.totalBalls = 0; state.thisOver = []; state.legalBallsThisOver = 0; state.innings = 1; state.target = 0; syncToFirebase();
+        state.history = []; state.redoHistory = []; state.runs = 0; state.wickets = 0; state.totalBalls = 0; state.thisOver = []; state.legalBallsThisOver = 0; state.innings = 1; state.target = 0; syncToFirebase();
       }
     };
 
@@ -448,12 +587,32 @@
       const safeUpdate = (id, value) => {
         const el = document.getElementById(id); if (el && document.activeElement !== el) el.value = value || "";
       };
-      safeUpdate('batTeam', state.batTeam); safeUpdate('bowlTeam', state.bowlTeam); safeUpdate('maxOvers', state.maxOvers); safeUpdate('statusBar', state.statusBar);
+      
+      safeUpdate('batTeam', state.batTeam); 
+      safeUpdate('bowlTeam', state.bowlTeam); 
+      safeUpdate('maxOvers', state.maxOvers); 
+      safeUpdate('statusBar', state.statusBar);
+      
       if (document.getElementById('displayScore')) document.getElementById('displayScore').innerText = state.runs;
       if (document.getElementById('displayWickets')) document.getElementById('displayWickets').innerText = state.wickets;
       if (document.getElementById('displayOvers')) document.getElementById('displayOvers').innerText = Math.floor(state.totalBalls / 6) + "." + (state.totalBalls % 6);
-      if (document.getElementById('thisOverUI')) document.getElementById('thisOverUI').innerHTML = (state.thisOver || []).map(b => `<div class="ball">${b}</div>`).join('');
+      if (document.getElementById('displayMaxOvers')) document.getElementById('displayMaxOvers').innerText = state.maxOvers || 20;
       if (document.getElementById('matchStatusText')) document.getElementById('matchStatusText').innerText = state.statusBar || "";
+
+      const thisOverUI = document.getElementById('thisOverUI');
+      if (thisOverUI) {
+        if (state.thisOver && state.thisOver.length > 0) {
+          thisOverUI.innerHTML = state.thisOver.map(ball => {
+            let className = "ball";
+            if (ball === 'W') className += " w";
+            if (ball === '4') className += " four";
+            if (ball === '6') className += " six";
+            return `<div class="${className}">${ball}</div>`;
+          }).join('');
+        } else {
+          thisOverUI.innerHTML = `<div style="color: var(--text-muted); font-size: 13px;">Start of over...</div>`;
+        }
+      }
     }
 
     async function syncToFirebase() {
@@ -485,7 +644,11 @@
         if (snapshot.exists()) {
           const firebaseState = snapshot.val();
           if (!state.lastUpdated || (firebaseState.lastUpdated > state.lastUpdated)) {
-            state = firebaseState; if (!state.thisOver) state.thisOver = []; if (!state.history) state.history = []; updateUI();
+            state = firebaseState; 
+            if (!state.thisOver) state.thisOver = []; 
+            if (!state.history) state.history = []; 
+            if (!state.redoHistory) state.redoHistory = [];
+            updateUI();
           } else if (state.lastUpdated > firebaseState.lastUpdated) {
             set(matchRef, state);
           }

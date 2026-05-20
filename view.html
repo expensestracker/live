@@ -2,38 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Crew Dashboard | Broadcast Director</title>
   <style>
-:root {
-    --bg: #ffffff;
-    --surface: #f4f6f8;
-    --text: #1a1a1a;
-    --text-muted: #666;
-    --accent: #0f5bfa;
-    --danger: #dc3545;
-    --success: #28a745;
-    --border: #e0e0e0;
-    --warning: #ff9800;
-    --offline: #9e9e9e;
-  }
+    :root {
+      --bg: #ffffff;
+      --surface: #f4f6f8;
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --accent: #0f5bfa;
+      --danger: #dc3545;
+      --success: #28a745;
+      --border: #e0e0e0;
+      --warning: #ff9800;
+      --offline: #9e9e9e;
+      --desktop-bg: #e9ecef;
+    }
+    
+    /* MOBILE FIRST BASE STYLES */
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg);
+      background-color: var(--desktop-bg);
       color: var(--text);
       margin: 0;
-      padding: 15px;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 100vh;
+      min-height: 100dvh;
     }
 
     .app-container {
       width: 100%;
       max-width: 950px;
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 0; /* Stack seamlessly on mobile */
+      flex-grow: 1;
       transition: opacity 0.3s ease;
     }
 
@@ -45,12 +51,17 @@
       filter: grayscale(40%);
     }
 
+    /* Flattened UI for Mobile */
     .panel {
       background: var(--bg);
       padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      border: 1px solid var(--border);
+      border-radius: 0;
+      box-shadow: none;
+      border: none;
+    }
+    .panel:last-child {
+      border-bottom: none;
+      flex-grow: 1; /* Stretch the last panel to fill screen */
     }
 
     .panel-title {
@@ -69,7 +80,7 @@
       text-transform: capitalize;
     }
 
-    /* Dynamic Connection Badge in Top Left */
+    /* Dynamic Connection Badge */
     .live-badge {
       display: flex;
       align-items: center;
@@ -92,12 +103,8 @@
       animation: blink 1.2s infinite;
     }
     @keyframes blink {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.3;
-      }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
 
     label {
@@ -145,23 +152,14 @@
       font-weight: bold;
       font-size: 14px;
     }
-    .ball.w {
-      background: var(--danger);
-      color: white;
-    }
-    .ball.four {
-      background: var(--accent);
-      color: white;
-    }
-    .ball.six {
-      background: var(--danger);
-      color: white;
-    }
+    .ball.w { background: var(--danger); color: white; }
+    .ball.four { background: var(--accent); color: white; }
+    .ball.six { background: var(--danger); color: white; }
 
-    /* UNIFIED STATS GRID - 4 Columns on Desktop, 2 on Mobile */
+    /* STATS GRID - 2 Columns on Mobile */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
       margin-bottom: 15px;
     }
@@ -194,18 +192,25 @@
       font-size: 14px;
     }
 
-    /* Mobile Responsiveness */
-    @media (max-width: 768px) {
+    /* DESKTOP RESPONSIVENESS */
+    @media (min-width: 768px) {
+      body {
+        padding: 20px 0;
+        justify-content: center;
+      }
       .app-container {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 15px;
+        flex-grow: 0;
+      }
+      .panel {
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        border: 1px solid var(--border);
       }
       .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    @media (max-width: 480px) {
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(4, 1fr); /* Back to 4 on desktop */
       }
     }
   </style>
@@ -248,54 +253,38 @@
       <div class="stats-grid">
         <div class="stat-card">
           <label>Current RR</label>
-          <div class="stat-val" id="crr">
-            0.00
-          </div>
+          <div class="stat-val" id="crr">0.00</div>
         </div>
         <div class="stat-card" id="projBox">
           <label>Projected Score</label>
-          <div class="stat-val" id="proj" style="color: var(--accent);">
-            0
-          </div>
+          <div class="stat-val" id="proj" style="color: var(--accent);">0</div>
         </div>
         <div class="stat-card" id="reqBox" style="display: none;">
           <label>Runs Needed</label>
-          <div class="stat-val" id="need" style="color: var(--accent);">
-            0
-          </div>
+          <div class="stat-val" id="need" style="color: var(--accent);">0</div>
         </div>
         <div class="stat-card" id="rrrBox" style="display: none;">
           <label>Required RR</label>
-          <div class="stat-val" id="rrr" style="color: var(--danger);">
-            0.00
-          </div>
+          <div class="stat-val" id="rrr" style="color: var(--danger);">0.00</div>
         </div>
         <div class="stat-card">
           <label>Match Target</label>
-          <div class="stat-val" id="target">
-            -
-          </div>
+          <div class="stat-val" id="target">-</div>
         </div>
         <div class="stat-card">
           <label>Total Balls</label>
-          <div class="stat-val" id="totalBallsRaw">
-            0
-          </div>
+          <div class="stat-val" id="totalBallsRaw">0</div>
         </div>
         <div class="stat-card">
           <label>Balls Remaining</label>
-          <div class="stat-val" id="ballsRemaining">
-            0
-          </div>
+          <div class="stat-val" id="ballsRemaining">0</div>
         </div>
       </div>
 
-      <div class="stat-card">
+      <div class="stat-card" style="margin-bottom: 0;">
         <label>This over</label>
         <div class="this-over" id="timeline">
-          <div style="color: var(--text-muted); font-size: 13px;">
-            Waiting for data...
-          </div>
+          <div style="color: var(--text-muted); font-size: 13px;">Waiting for data...</div>
         </div>
       </div>
     </div>
