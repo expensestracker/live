@@ -312,7 +312,7 @@
       customTitle: "",
       customText: "",
       customImg: "",
-      showParticles: false // Added particles state
+      showParticles: false 
     };
 
     let isConnected = false;
@@ -398,11 +398,18 @@
 
     function updateUI() {
       const safeUpdate = (id, value) => {
-        const el = document.getElementById(id); if (el && document.activeElement !== el) el.value = value || "";
+        const el = document.getElementById(id); 
+        if (el && document.activeElement !== el) el.value = value ?? "";
       };
-      safeUpdate('statusBar', state.statusBar); safeUpdate('timerMessage', state.timerMessage); safeUpdate('timerTarget', state.timerTarget);
-      safeUpdate('brandTitle', state.brandTitle); safeUpdate('brandSub', state.brandSub); safeUpdate('brandLogo', state.brandLogo);
-      safeUpdate('customTitle', state.customTitle); safeUpdate('customText', state.customText); safeUpdate('customImg', state.customImg);
+      safeUpdate('statusBar', state.statusBar); 
+      safeUpdate('timerMessage', state.timerMessage); 
+      safeUpdate('timerTarget', state.timerTarget);
+      safeUpdate('brandTitle', state.brandTitle); 
+      safeUpdate('brandSub', state.brandSub); 
+      safeUpdate('brandLogo', state.brandLogo);
+      safeUpdate('customTitle', state.customTitle); 
+      safeUpdate('customText', state.customText); 
+      safeUpdate('customImg', state.customImg);
 
       // Added Particle Toggle UI update
       const particleToggle = document.getElementById('particleToggle');
@@ -414,17 +421,23 @@
     }
 
     async function syncToFirebase() {
-      state.statusBar = document.getElementById('statusBar')?.value || state.statusBar;
-      state.timerMessage = document.getElementById('timerMessage')?.value || state.timerMessage;
-      state.timerTarget = document.getElementById('timerTarget')?.value || state.timerTarget;
-      state.brandTitle = document.getElementById('brandTitle')?.value || state.brandTitle;
-      state.brandSub = document.getElementById('brandSub')?.value || state.brandSub;
-      state.brandLogo = document.getElementById('brandLogo')?.value || state.brandLogo;
-      state.customTitle = document.getElementById('customTitle')?.value || state.customTitle;
-      state.customText = document.getElementById('customText')?.value || state.customText;
-      state.customImg = document.getElementById('customImg')?.value || state.customImg;
+      // Helper to fetch the value explicitly so empty strings aren't falsely rejected
+      const getVal = (id, fallback) => {
+        const el = document.getElementById(id);
+        return el !== null ? el.value : fallback;
+      };
+
+      state.statusBar = getVal('statusBar', state.statusBar);
+      state.timerMessage = getVal('timerMessage', state.timerMessage);
+      state.timerTarget = getVal('timerTarget', state.timerTarget);
+      state.brandTitle = getVal('brandTitle', state.brandTitle);
+      state.brandSub = getVal('brandSub', state.brandSub);
+      state.brandLogo = getVal('brandLogo', state.brandLogo);
+      state.customTitle = getVal('customTitle', state.customTitle);
+      state.customText = getVal('customText', state.customText);
+      state.customImg = getVal('customImg', state.customImg);
       
-      // Added particles state update
+      // Particles state update
       state.showParticles = document.getElementById('particleToggle')?.checked || false;
       
       state.lastUpdated = Date.now();
