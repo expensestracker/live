@@ -298,19 +298,24 @@
       </div>
 
       <label>On Live</label>
-      <div style="background: #fff5f5; border-left: 6px solid var(--danger); padding: 10px; border-radius: 6px; margin-bottom: 25px; font-size: 14px; font-weight: 900; color: var(--danger);" id="activeSceneText">
+      <div style="background: #fff5f5; border-left: 6px solid var(--danger); padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px; font-weight: 900; color: var(--danger);" id="activeSceneText">
         1. Live Score
+      </div>
+
+      <label style="color: var(--accent);">Active Branding Package</label>
+      <div style="background: #f0f4ff; border-left: 6px solid var(--accent); padding: 12px; border-radius: 6px; margin-bottom: 25px; font-size: 14px; font-weight: 900; color: #0b43b8;" id="brandHighlightBox">
+        <span id="brandText">None</span>
       </div>
 
       <label>Broadcast Data</label>
       <div class="stat-card">
         <div class="info-row">
-          <span class="info-label">Event/Brand</span>
-          <span class="info-val" id="brandText">None</span>
-        </div>
-        <div class="info-row">
           <span class="info-label">Timer Status</span>
           <span class="info-val" id="timerInfo">Inactive</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Custom Graphic Code</span>
+          <span class="info-val" id="customCodeInfo" style="color: var(--accent);">None</span>
         </div>
         <div class="info-row" style="border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
           <span class="info-label">Winner Locked</span>
@@ -392,7 +397,6 @@
       }
     }
 
-    // Force Reconnect Logic
     window.addEventListener('online', () => {
       goOnline(db); evaluateConnection();
     });
@@ -415,8 +419,23 @@
       document.getElementById('displayWickets').innerText = data.wickets || 0;
       document.getElementById('maxOvers').innerText = data.maxOvers || 20;
       document.getElementById('matchStatusText').innerText = data.statusBar || "";
-      document.getElementById('brandText').innerText = data.brandTitle || "None";
       document.getElementById('winnerInfo').innerText = data.winText ? "Yes": "No";
+
+      // Enhanced Branding Header Parsing Engine 
+      if (data.brandTitle) {
+        document.getElementById('brandText').innerText = data.brandTitle + (data.brandSub ? ` — ${data.brandSub}` : '');
+      } else {
+        document.getElementById('brandText').innerText = "None Configured";
+      }
+
+      // Read Custom Code Parameters injection state
+      if (data.customHtml && data.customHtml.trim() !== "") {
+        document.getElementById('customCodeInfo').innerText = `Active (${data.customHtml.length} chars)`;
+        document.getElementById('customCodeInfo').style.color = "var(--success)";
+      } else {
+        document.getElementById('customCodeInfo').innerText = "None";
+        document.getElementById('customCodeInfo').style.color = "var(--text-muted)";
+      }
 
       // Overs & Balls
       const totalBalls = data.totalBalls || 0;

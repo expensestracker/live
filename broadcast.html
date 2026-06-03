@@ -2,44 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Broadcast Control</title>
   <style>
-:root {
-    --bg: #ffffff;
-    --surface: #f4f6f8;
-    --text: #1a1a1a;
-    --text-muted: #666;
-    --accent: #0f5bfa;
-    --danger: #dc3545;
-    --success: #28a745;
-    --border: #e0e0e0;
-    --warning: #ff9800;
-    --offline: #9e9e9e;
-  }
+    :root {
+      --bg: #ffffff;
+      --surface: #f4f6f8;
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --accent: #0f5bfa;
+      --danger: #dc3545;
+      --success: #28a745;
+      --border: #e0e0e0;
+      --warning: #ff9800;
+      --offline: #9e9e9e;
+      --desktop-bg: #e9ecef;
+    }
+    
+    /* MOBILE FIRST BASE STYLES */
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg);
+      background-color: var(--desktop-bg);
       color: var(--text);
       margin: 0;
-      padding: 15px;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 100vh;
+      min-height: 100dvh;
     }
+
     .app-container {
       width: 100%;
-      max-width: 500px;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      gap: 0; 
+      flex-grow: 1;
     }
+
     .panel {
       background: var(--bg);
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.01);
-      border: 1px solid var(--border);
+      padding: 20px;
+      border-radius: 0;
+      box-shadow: none;
+      border: none;
+      border-bottom: 1px solid var(--border);
     }
+    .panel:last-child {
+      border-bottom: none;
+      flex-grow: 1; 
+    }
+
     .panel-title {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: bold;
       margin-bottom: 15px;
       border-bottom: 2px solid var(--surface);
@@ -48,10 +65,12 @@
       justify-content: space-between;
       align-items: center;
     }
+
     #systemStatusText {
-      transition: color 0.5s ease;
+      transition: color 0.3s ease;
       text-transform: capitalize;
     }
+
     .live-badge {
       display: flex;
       align-items: center;
@@ -74,40 +93,44 @@
       animation: blink 1.2s infinite;
     }
     @keyframes blink {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.3;
-      }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
+
+    /* Input & Form Styling */
     input, select, textarea {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       box-sizing: border-box;
       background: var(--bg);
       font-family: inherit;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      font-size: 14px;
     }
-    
-    /* Override global input style for the toggle */
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 91, 250, 0.1);
+    }
     input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       margin-right: 10px;
       margin-bottom: 0;
       cursor: pointer;
+      accent-color: var(--accent);
     }
 
     label {
       display: block;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: bold;
       color: var(--text-muted);
-      margin-bottom: 5px;
-      text-transform: capitalize;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .toggle-wrapper {
@@ -118,6 +141,11 @@
       font-weight: bold;
       color: var(--text);
       text-transform: none;
+      letter-spacing: 0;
+      background: var(--bg);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
     }
 
     button {
@@ -126,32 +154,33 @@
       border: 1px solid var(--border);
       padding: 15px 0;
       border-radius: 8px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: bold;
       cursor: pointer;
       transition: 0.1s;
     }
-    button:active {
-      transform: scale(0.95);
-    }
-    button:hover {
-      background: var(--bg);
-    }
+    button:active { transform: scale(0.98); }
+    button:hover { background: #e9ecef; }
+
+    /* Scene Grid */
     .scene-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
-      margin-bottom: 15px;
     }
     .scene-btn {
-      font-size: 12px;
-      padding: 10px;
+      font-size: 13px;
+      padding: 12px;
+      background: var(--bg);
     }
     .scene-btn.active {
       border-color: var(--accent);
       color: var(--accent);
       background: #f0f7ff;
+      box-shadow: 0 2px 8px rgba(15, 91, 250, 0.15);
     }
+
+    /* Effects Row */
     .effect-row {
       display: flex;
       gap: 10px;
@@ -159,100 +188,158 @@
     .btn-fx {
       background: #343a40;
       color: white;
-      font-size: 12px;
+      font-size: 13px;
       flex: 1;
-      padding: 10px;
+      padding: 12px;
+      border: none;
     }
+    .btn-fx:hover { filter: brightness(1.1); }
+    
     .btn-action {
       background: #1a1a1a;
       color: white;
       border: none;
-      padding: 12px;
+      padding: 14px;
       border-radius: 8px;
       width: 100%;
       cursor: pointer;
       font-weight: bold;
-      margin-top: 10px;
     }
-    .btn-success {
-      background: var(--success);
-      color: white;
-    }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #218838; }
+
     .input-group {
       display: flex;
       gap: 10px;
     }
-    .input-group > div {
-      flex: 1;
+    .input-group > div { flex: 1; }
+    .input-group > input { margin-bottom: 12px; }
+
+    /* THEMATIC CONFIGURATION CARDS */
+    .config-card {
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .card-scenes { background: #f8f9fa; border: 1px solid #e9ecef; border-left: 5px solid var(--text); }
+    .card-effects { background: #fff5f6; border: 1px solid #ffebee; border-left: 5px solid var(--danger); } /* Lightened */
+    .card-branding { background: #f0f4ff; border: 1px solid #cce0ff; border-left: 5px solid var(--accent); }
+    .card-custom { background: #f5f5f5; border: 1px solid #e0e0e0; border-left: 5px solid #616161; }
+
+    /* DESKTOP RESPONSIVENESS */
+    @media (min-width: 768px) {
+      body {
+        padding: 20px 0;
+        justify-content: center;
+      }
+      .app-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        flex-grow: 0;
+      }
+      .panel {
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        border: 1px solid var(--border);
+      }
+      .scene-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
     }
   </style>
 </head>
 <body>
 
   <div class="app-container" id="main-app">
+    
+    <!-- LEFT COLUMN: Live Controls -->
     <div class="panel">
       <div class="panel-title">
-        <span id="systemStatusText"></span>
+        <span id="systemStatusText">Connecting...</span>
         <div class="live-badge" id="topBadge">
           <div class="dot" id="topBadgeDot"></div>
-          <span id="topBadgeText"></span>
+          <span id="topBadgeText">WAIT</span>
         </div>
       </div>
 
-      <label>Active Scene Switcher</label>
-      <div class="scene-grid">
-        <button class="scene-btn active" id="btn-scene-live" onclick="setScene('live')">1. Live Score</button>
-        <button class="scene-btn" id="btn-scene-timer" onclick="setScene('timer')">2. Pre-Match</button>
-        <button class="scene-btn" id="btn-scene-decision" onclick="setScene('decision')">3. Umpire</button>
-        <button class="scene-btn" id="btn-scene-winner" onclick="setScene('winner')">4. Result</button>
-        <button class="scene-btn" id="btn-scene-custom" onclick="setScene('custom')" style="grid-column: span 2">5. Custom Image Graphic</button>
-      </div>
-
-      <div style="margin-top:20px">
-        <label>Match Status on Live</label>
-        <input type="text" id="statusBar" placeholder="e.g., IND won the toss and chose to bat">
-
-        <div style="margin-top: 15px">
-          <label>Top-Left Branding</label>
-          <div class="input-group">
-            <input type="text" id="brandTitle" placeholder="Heading (e.g., T20 CUP)">
-            <input type="text" id="brandSub" placeholder="Sub-text (e.g., Match 12)">
-          </div>
-          <input type="text" id="brandLogo" placeholder="Logo Image URL (Optional)">
-        </div>
-
-        <div style="margin-top: 15px;">
-          <label>Custom Graphic (Scene 5)</label>
-          <input type="text" id="customImg" placeholder="Image URL (e.g., Sponsor/Player Banner)">
-          <input type="text" id="customTitle" placeholder="Main Heading (e.g., PLAYER OF THE MATCH)">
-          <input type="text" id="customText" placeholder="Sub-text or Stats description">
-        </div>
-
-        <div style="margin-top:15px">
-          <label>Timer Settings (Scene 2)</label>
-          <input type="text" id="timerMessage" placeholder="Starting in" value="Starting in">
-          <input type="datetime-local" id="timerTarget">
-        </div>
-
-        <button class="btn-action btn-success" style="background: var(--success);" onclick="declareResult()">Show Result</button>
-
-        <div style="margin-top:20px">
-          <label>Screen Effects on Live</label>
-          <div class="effect-row">
-            <button class="btn-fx" style="background: #0d47a1" onclick="triggerEffect('FOUR')">Four</button>
-            <button class="btn-fx" style="background: #ad00b9" onclick="triggerEffect('SIX')">Six</button>
-            <button class="btn-fx" style="background: var(--danger);" onclick="triggerEffect('OUT')">Out</button>
-          </div>
-        </div>
-
-        <div style="margin-top:20px; padding-top: 15px; border-top: 1px solid var(--border);">
-          <label>Visual Effects</label>
-          <label class="toggle-wrapper">
-            <input type="checkbox" id="particleToggle">
-            Show Background Particles
-          </label>
+      <!-- Card: Scenes -->
+      <div class="config-card card-scenes">
+        <label style="color: var(--text);">Active Scene Switcher</label>
+        <div class="scene-grid">
+          <button class="scene-btn active" id="btn-scene-live" onclick="setScene('live')">1. Live Score</button>
+          <button class="scene-btn" id="btn-scene-timer" onclick="setScene('timer')">2. Pre-Match</button>
+          <button class="scene-btn" id="btn-scene-decision" onclick="setScene('decision')">3. Umpire</button>
+          <button class="scene-btn" id="btn-scene-winner" onclick="setScene('winner')">4. Result</button>
+          <button class="scene-btn" id="btn-scene-custom" onclick="setScene('custom')" style="grid-column: 1 / -1;">5. Custom Image Graphic</button>
         </div>
       </div>
+
+      <!-- Combined Card: Resolution, Screen FX, Visual FX (Moved below Scenes) -->
+      <div class="config-card card-effects" style="margin-bottom: 0;">
+        <label style="color: var(--danger); font-size: 14px; margin-bottom: 12px;">Match Actions & Effects</label>
+        
+        <label>Visual Effects</label>
+        <label class="toggle-wrapper" style="border-color: #ffcdd2; margin-bottom: 15px;">
+          <input type="checkbox" id="particleToggle">
+          Show Background Particles
+        </label>
+
+        <label>Screen Effects</label>
+        <div class="effect-row" style="margin-bottom: 15px;">
+          <button class="btn-fx" style="background: #0d47a1" onclick="triggerEffect('FOUR')">Four</button>
+          <button class="btn-fx" style="background: #ad00b9" onclick="triggerEffect('SIX')">Six</button>
+          <button class="btn-fx" style="background: var(--danger);" onclick="triggerEffect('OUT')">Out</button>
+        </div>
+
+        <label>Match Resolution</label>
+        <button class="btn-action btn-success" onclick="declareResult()">Declare Winner / Result</button>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Setup & Configuration -->
+    <div class="panel">
+      
+      <!-- Combined Card: Status, Branding, Timer (Moved to Right Column for balance) -->
+      <div class="config-card card-branding">
+        <label style="color: var(--accent); font-size: 14px; margin-bottom: 12px;">Match Status & Overlays</label>
+        
+        <label>Live Status</label>
+        <input type="text" id="statusBar" placeholder="e.g. IND won toss" style="border-color: #b3d1ff;">
+
+        <label>Top-Left Branding</label>
+        <div class="input-group">
+          <input type="text" id="brandTitle" placeholder="Heading" style="border-color: #b3d1ff;">
+          <input type="text" id="brandSub" placeholder="Sub-text" style="border-color: #b3d1ff;">
+        </div>
+        <input type="text" id="brandLogo" placeholder="Logo URL" style="border-color: #b3d1ff;">
+
+        <label>Timer Settings</label>
+        <div style="display: flex; gap: 10px;">
+          <!-- 3:1 Ratio for Timer inputs -->
+          <input type="text" id="timerMessage" placeholder="Prefix" value="Starting in" style="flex: 3; border-color: #b3d1ff; margin-bottom: 0;">
+          <input type="datetime-local" id="timerTarget" style="flex: 1; border-color: #b3d1ff; margin-bottom: 0;">
+        </div>
+      </div>
+
+      <!-- Card: Custom Graphics -->
+      <div class="config-card card-custom" style="margin-bottom: 0;">
+        <label style="color: #616161; font-size: 14px; margin-bottom: 12px;">Custom Graphic Module</label>
+        
+        <div style="display: flex; gap: 6px; align-items: flex-start;">
+          <input type="text" id="customImg" placeholder="Image URL" style="flex-grow: 1; border-color: #e0e0e0;">
+          <button type="button" onclick="document.getElementById('customImg').value='https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1305&auto=format&fit=crop'; document.getElementById('customImg').dispatchEvent(new Event('change'));" style="padding: 0 12px; height: 42px; font-size: 11px; white-space: nowrap; border-radius: 8px; background: #e2e6ea; margin-bottom: 12px; border: 1px solid var(--border);">Placeholder</button>
+        </div>
+        
+        <input type="text" id="customTitle" placeholder="Main Heading" style="border-color: #e0e0e0;">
+        <input type="text" id="customText" placeholder="Sub-text" style="border-color: #e0e0e0;">
+        
+        <label style="font-size: 11px; margin-top: 5px; color: #616161;">HTML/CSS Injector</label>
+        <textarea id="customHtml" placeholder="<div>Live</div>&#10;<style> body { background: none; } </style>" rows="4" style="font-family: monospace; font-size: 12px; resize: vertical; margin-bottom: 0; background: #1e1e1e; color: #d4d4d4; border-color: #333;"></textarea>
+      </div>
+
     </div>
   </div>
 
@@ -312,6 +399,7 @@
       customTitle: "",
       customText: "",
       customImg: "",
+      customHtml: "", 
       showParticles: false 
     };
 
@@ -338,24 +426,17 @@
         sysStatus.innerText = "No Server"; sysStatus.style.color = "var(--accent)";
       } else {
         updateBadge("LIVE", "var(--danger)", true);
-        sysStatus.innerText = "Broadcast Board"; sysStatus.style.color = "var(--text)";
+        sysStatus.innerText = "Control Panel"; sysStatus.style.color = "var(--text)";
         if (needsSync) {
           set(matchRef, state); needsSync = false;
         }
       }
     }
 
-    window.addEventListener('online', () => {
-      goOnline(db); evaluateSystemStatus();
-    });
-    window.addEventListener('offline', () => {
-      goOffline(db); evaluateSystemStatus();
-    });
-    onValue(connectedRef, (snap) => {
-      isConnected = snap.val() === true; evaluateSystemStatus();
-    });
+    window.addEventListener('online', () => { goOnline(db); evaluateSystemStatus(); });
+    window.addEventListener('offline', () => { goOffline(db); evaluateSystemStatus(); });
+    onValue(connectedRef, (snap) => { isConnected = snap.val() === true; evaluateSystemStatus(); });
 
-    // Sync state dynamically if scoring panel updates
     onValue(matchRef, (snapshot) => {
       if (snapshot.exists()) {
         const dbState = snapshot.val();
@@ -410,8 +491,8 @@
       safeUpdate('customTitle', state.customTitle); 
       safeUpdate('customText', state.customText); 
       safeUpdate('customImg', state.customImg);
+      safeUpdate('customHtml', state.customHtml); 
 
-      // Added Particle Toggle UI update
       const particleToggle = document.getElementById('particleToggle');
       if(particleToggle) particleToggle.checked = !!state.showParticles;
 
@@ -421,7 +502,6 @@
     }
 
     async function syncToFirebase() {
-      // Helper to fetch the value explicitly so empty strings aren't falsely rejected
       const getVal = (id, fallback) => {
         const el = document.getElementById(id);
         return el !== null ? el.value : fallback;
@@ -436,10 +516,9 @@
       state.customTitle = getVal('customTitle', state.customTitle);
       state.customText = getVal('customText', state.customText);
       state.customImg = getVal('customImg', state.customImg);
+      state.customHtml = getVal('customHtml', state.customHtml); 
       
-      // Particles state update
       state.showParticles = document.getElementById('particleToggle')?.checked || false;
-      
       state.lastUpdated = Date.now();
 
       updateUI();
@@ -451,7 +530,7 @@
       }
     }
 
-    document.querySelectorAll('input').forEach(el => el.addEventListener('change', syncToFirebase));
+    document.querySelectorAll('input, textarea').forEach(el => el.addEventListener('change', syncToFirebase));
 
     async function initSystem() {
       const localBackup = localStorage.getItem('admin_broadcast_backup');
@@ -467,10 +546,8 @@
             state = firebaseState; 
             if (!state.thisOver) state.thisOver = []; 
             if (!state.history) state.history = []; 
-            
-            // Added fallback logic for legacy data missing showParticles
             if (state.showParticles === undefined) state.showParticles = false; 
-            
+            if (state.customHtml === undefined) state.customHtml = "";
             updateUI();
           } else if (state.lastUpdated > firebaseState.lastUpdated) {
             set(matchRef, state);
