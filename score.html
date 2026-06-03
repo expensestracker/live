@@ -360,8 +360,8 @@
     const matchRef = ref(db, 'broadcast_state');
     const connectedRef = ref(db, ".info/connected");
 
-    let state = {
-      lastUpdated: Date.now(),
+        let state = {
+      lastUpdated: 0, // <-- The fix Date.now(),
       history: [],
       redoHistory: [],
       batTeam: "IND",
