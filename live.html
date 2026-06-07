@@ -41,7 +41,7 @@
     .global-bar {
       position: absolute;
       top: 30px;
-      right: 40px;
+      right: 70px;
       display: flex;
       gap: 20px;
       align-items: center;
@@ -79,14 +79,14 @@
     }
     @keyframes pulse {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+      50% { opacity: 0.2; }
     }
 
     /* Top Left Branding System */
     .top-left-brand {
       position: absolute;
       top: 30px;
-      left: 40px;
+      left: 70px;
       display: flex;
       align-items: center;
       gap: 15px;
@@ -105,7 +105,8 @@
     .brand-title {
       font-family: 'Arial Black', sans-serif;
       font-size: 24px;
-      color: var(--accent);
+      font-weight: bold;
+      color: var(--bg);
       margin: 0;
       padding: 0;
       line-height: 1.1;
@@ -451,9 +452,7 @@
       <div class="live-dot" id="liveDot"></div>
       <span id="liveText">LIVE</span>
     </div>
-    <div class="clock" id="systemClock">
-      00:00:00
-    </div>
+    <div class="clock" id="systemClock">00:00:00 PM</div>
   </div>
 
   <div class="top-left-brand" id="brandingBox" style="display: none;">
@@ -646,11 +645,15 @@
 
 
     // System Clock
-    setInterval(() => {
-      document.getElementById('systemClock').innerText = new Date().toLocaleTimeString('en-IN', {
-        hour12: true
-      });
-    }, 1000);
+setInterval(() => {
+  document.getElementById('systemClock').innerText =
+    new Date().toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    }).toUpperCase();
+}, 1000);
 
     // --- CONNECTION HANDLING ---
     let isConnected = false;
@@ -669,7 +672,7 @@
         indicator.style.color = 'var(--accent)';
         dot.style.background = 'var(--accent)';
         dot.style.animation = 'none';
-        text.innerText = 'Connecting';
+        text.innerText = 'SYNCING';
       } else {
         indicator.style.color = 'var(--danger)';
         dot.style.background = 'var(--danger)';
