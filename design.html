@@ -1,234 +1,591 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Match Schedule - Neon Overlay</title>
-  <style>
-    :root {
-      /* Glow & Neon Colors */
-      --cyan-glow: #00d2ff;
-      --cyan-shadow: rgba(0, 210, 255, 0.5);
-      
-      /* Orange Badge Colors */
-      --orange-top: #ffcf00;
-      --orange-bottom: #f57c00;
-      --orange-border: #ffecb3;
-      --orange-shadow: rgba(245, 124, 0, 0.6);
-      
-      /* Card Colors */
-      --card-bg-top: #ffffff;
-      --card-bg-bottom: #e6ebf0;
-      --text-dark: #111111;
-      --text-muted: #555555;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cricket Scoreboard - Projector</title>
+<style>
+  :root {
+    --bg-main: #f2f6fa;
+    --dark-blue: #0b132b;
+    
+    --aus-light: #1866e8;
+    --aus-dark: #071d59;
+    --aus-accent: #00d2ff;
+    
+    --ind-light: #0ea84d;
+    --ind-dark: #06401d;
+    --ind-accent: #5ef095;
+    
+    /* Using standard system fonts instead of external ones */
+    --font-display: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-base: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-    body {
-      /* Transparent background for OBS/Projector overlay */
-      background: transparent; 
-      font-family: 'Arial Black', -apple-system, BlinkMacSystemFont, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center; 
-      min-height: 100vh; 
-      padding: 0; 
-      margin: 0;
-      overflow-x: hidden;
-    }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000; 
+    font-family: var(--font-base);
+    overflow: hidden; 
+  }
 
-    .schedule-container {
-      width: 100%;
-      max-width: 90%; /* Adjusted to 90% per request */
-      display: flex;
-      flex-direction: column;
-      gap: 35px; /* Increased gap between match cards */
-    }
+  .scoreboard-container {
+    container-type: inline-size;
+    container-name: scoreboard;
+    
+    /* Fills the screen maintaining 16:9 ratio with NO outer margins */
+    width: 100vw; 
+    max-width: calc(100vh * 16 / 9);
+    aspect-ratio: 16 / 9;
+    margin: 0 auto;
+    
+    background: var(--bg-main);
+    background-image: radial-gradient(circle at 50% 50%, #ffffff 0%, #eef3f9 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    padding: 1.5cqw;
+    gap: 1.2cqw;
+    
+    border-radius: 0; 
+    position: relative;
+  }
 
-    /* Individual Match Row with Staggered Entrance Animation */
-    .match-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      width: 100%;
-      opacity: 0;
-      animation: fadeSlideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-    }
+  /* --- HEADER --- */
+  .header {
+    height: 4.8cqw;
+    min-height: 4.8cqw;
+    background: linear-gradient(90deg, #0d172e, #142245, #0d172e);
+    border-radius: 0.8cqw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2cqw;
+    color: white;
+    font-weight: 700;
+    position: relative;
+  }
 
-    /* Entrance Animation Delays */
-    .match-row:nth-child(1) { animation-delay: 0.1s; }
-    .match-row:nth-child(2) { animation-delay: 0.25s; }
-    .match-row:nth-child(3) { animation-delay: 0.4s; }
-    .match-row:nth-child(4) { animation-delay: 0.55s; }
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.8cqw;
+    font-size: 1.3cqw;
+    letter-spacing: 0.05cqw;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+  }
 
-    @keyframes fadeSlideUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+  .header-left svg {
+    width: 1.8cqw;
+    height: 1.8cqw;
+    fill: white;
+  }
 
-    /* White Team Cards */
-    .team-card {
-      width: 48.5%;
-      background: linear-gradient(180deg, var(--card-bg-top) 0%, var(--card-bg-bottom) 100%);
-      border-radius: 20px;
-      border: 1px solid #ffffff;
-      border-bottom: 14px solid var(--orange-bottom);
-      padding: 28px 15px; /* Increased top/bottom padding to increase card height */
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      animation: cyanGlow 3s infinite alternate ease-in-out; /* Continuous attention animation */
-    }
+  .header-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
 
-    /* Padding adjustments so text is visually centered despite the overlapping central badge */
-    .team-card.left { padding-right: 70px; }
-    .team-card.right { padding-left: 70px; }
+  .match-badge-wrapper {
+    background: linear-gradient(90deg, #00d2ff, #00ff88);
+    padding: 0 0.15cqw 0.2cqw 0.15cqw;
+    clip-path: polygon(1.5cqw 0, calc(100% - 1.5cqw) 0, 100% 100%, 0 100%);
+    height: 100%;
+  }
 
-    /* Team Typography - Enlarged & Uppercase removed */
-    .team-name {
-      font-size: 40px; /* Increased font size */
-      font-weight: 900;
-      color: var(--text-dark);
-      /* text-transform: uppercase; (Removed) */
-      letter-spacing: 0.5px;
-      line-height: 1.1;
-      text-align: center;
-    }
+  .match-badge {
+    background: #0b132b;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 3.5cqw;
+    clip-path: polygon(1.4cqw 0, calc(100% - 1.4cqw) 0, 100% 100%, 0 100%);
+    font-family: var(--font-display);
+    font-size: 1.6cqw;
+    letter-spacing: 0.1cqw;
+  }
 
-    .team-address {
-      font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
-      font-size: 24px; /* Increased font size */
-      font-weight: 800;
-      color: var(--text-muted);
-      margin-top: 6px;
-      /* text-transform: uppercase; (Removed) */
-      letter-spacing: 1px;
-      text-align: center;
-    }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1cqw;
+    font-size: 1.1cqw;
+    font-weight: 600;
+  }
 
-    /* Always-On Attention Animation: Center badge scaling & glowing heartbeat */
-    @keyframes badgePulse {
-      0% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow: 0 6px 15px var(--orange-shadow), inset 0 2px 4px rgba(255,255,255,0.4);
-      }
-      100% {
-        transform: translate(-50%, -50%) scale(1.05); /* Slight pop/scale */
-        box-shadow: 0 10px 30px var(--orange-bottom), inset 0 2px 8px rgba(255,255,255,0.6);
-      }
-    }
+  .live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5cqw;
+  }
 
-    /* Central Orange Match Badge */
-    .match-badge {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      z-index: 10;
-      
-      background: linear-gradient(180deg, var(--orange-top) 0%, var(--orange-bottom) 100%);
-      border: 2px solid var(--orange-border);
-      border-radius: 8px;
-      padding: 8px 15px; 
-      
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-width: 110px; 
-      animation: badgePulse 2s infinite alternate ease-in-out; /* Continuous attention animation */
-    }
+  .live-dot {
+    width: 0.8cqw;
+    height: 0.8cqw;
+    background-color: #ff0044;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
 
-    /* BIG Match Number */
-    .match-num {
-      font-size: 64px;
-      font-weight: 900;
-      color: var(--text-dark);
-      line-height: 1;
-      margin-bottom: 2px;
-      text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
-    }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 0, 68, 0.7); }
+    70% { box-shadow: 0 0 0 0.5cqw rgba(255, 0, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 0, 68, 0); }
+  }
 
-    .match-time {
-      font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
-      font-size: 20px;
-      font-weight: 900;
-      color: var(--text-dark);
-      margin-top: 0;
-    }
-  </style>
+  .divider {
+    width: 0.1cqw;
+    height: 1.5cqw;
+    background: rgba(255,255,255,0.3);
+  }
+
+  /* --- SCORE ROW --- */
+  .score-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1; 
+    min-height: 0; 
+  }
+
+  .team-card {
+    height: 100%;
+    width: 28%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: white;
+    position: relative;
+  }
+
+  .aus-card {
+    background: linear-gradient(120deg, var(--aus-light) 0%, var(--aus-dark) 100%);
+    clip-path: polygon(0 0, 85% 0, 100% 100%, 0 100%);
+    border-radius: 1.2cqw 0 0 1.2cqw;
+    padding-left: 3.5cqw;
+  }
+
+  .ind-card {
+    background: linear-gradient(-120deg, var(--ind-light) 0%, var(--ind-dark) 100%);
+    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+    border-radius: 0 1.2cqw 1.2cqw 0;
+    padding-right: 3.5cqw;
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  .team-name-row {
+    display: flex;
+    align-items: center;
+    gap: 1cqw;
+  }
+
+  .team-name {
+    font-family: var(--font-display);
+    font-size: 8.5cqw;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.2cqw;
+  }
+
+  .team-icon {
+    width: 4cqw;
+    height: 4cqw;
+  }
+
+  .aus-card .team-status, .ind-card .team-status {
+    font-weight: 700;
+    letter-spacing: 0.1cqw;
+    font-size: 1.2cqw;
+    margin-top: -0.5cqw;
+  }
+
+  .aus-card .team-status {
+    color: var(--aus-accent);
+    margin-left: 0.5cqw;
+  }
+
+  .ind-card .team-status {
+    color: var(--ind-accent);
+    margin-right: 0.5cqw;
+  }
+
+  .score-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .main-runs {
+    font-family: var(--font-display);
+    font-size: 15cqw;
+    font-weight: 800;
+    line-height: 0.85;
+    color: var(--dark-blue);
+    display: flex;
+    align-items: center;
+    gap: 1cqw;
+    letter-spacing: -0.4cqw;
+  }
+
+  .main-runs .dash {
+    font-size: 8cqw;
+    transform: translateY(-0.8cqw);
+  }
+
+  .overs-container {
+    position: relative;
+    width: 25cqw;
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5cqw;
+  }
+
+  .overs-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 0.15cqw;
+    background: #d5dce6;
+    z-index: 1;
+  }
+
+  .overs-line::before, .overs-line::after {
+    content: '';
+    position: absolute;
+    top: -0.15cqw;
+    width: 0.5cqw;
+    height: 0.5cqw;
+    border-radius: 50%;
+    background: #bdc5d1;
+  }
+  .overs-line::before { left: 0; }
+  .overs-line::after { right: 0; }
+
+  .overs-pill {
+    position: relative;
+    z-index: 2;
+    background: var(--bg-main);
+    padding: 0 1cqw;
+    display: flex;
+    align-items: center;
+    gap: 0.6cqw;
+    font-family: var(--font-display);
+    font-size: 1.6cqw;
+    font-weight: 700;
+    color: var(--dark-blue);
+  }
+
+  .overs-val {
+    background: var(--dark-blue);
+    color: white;
+    padding: 0.1cqw 1cqw;
+    border-radius: 0.6cqw;
+    font-size: 2.2cqw;
+  }
+
+  /* --- STATS SECTION (Single Row, 4 Key Stats) --- */
+  .stats-row {
+    background: #ffffff;
+    border-radius: 0.8cqw;
+    display: flex;
+    align-items: stretch; 
+    box-shadow: 0 0.5cqw 1.5cqw rgba(0, 0, 0, 0.04);
+    height: 12cqw; 
+  }
+
+  .stat-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1cqw;
+  }
+
+  .stat-divider {
+    width: 0.1cqw;
+    background: #e4e9f0;
+    margin: 1.5cqw 0; 
+  }
+
+  .icon-wrapper {
+    width: 3.5cqw;
+    height: 3.5cqw;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.8cqw;
+  }
+
+  .icon-wrapper svg {
+    width: 2cqw;
+    height: 2cqw;
+  }
+
+  .stat-label {
+    font-size: 1cqw;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.1cqw;
+    text-align: center; 
+    line-height: 1.2;
+    margin-bottom: 0.2cqw;
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 4.2cqw; 
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.1cqw;
+  }
+
+  /* Stat Specific Colors */
+  .c-need .icon-wrapper { background: #e6f7eb; }
+  .c-need svg { fill: #00b347; }
+  .c-need .stat-value { color: #00b347; }
+
+  .c-balls .icon-wrapper { background: #fff6e6; }
+  .c-balls svg { fill: #ffaa00; }
+  .c-balls .stat-value { color: #ffb400; }
+
+  .c-crr .icon-wrapper { background: #e6f0ff; }
+  .c-crr svg { fill: #0066ff; }
+  .c-crr .stat-value { color: #0066ff; }
+
+  .c-rrr .icon-wrapper { background: #ffebeb; }
+  .c-rrr svg { fill: #ff3333; }
+  .c-rrr .stat-value { color: #ff3333; }
+
+  /* --- TIMELINE SECTION --- */
+  .timeline-wrapper {
+    background: #ffffff;
+    border-radius: 0.8cqw;
+    box-shadow: 0 0.5cqw 1.5cqw rgba(0, 0, 0, 0.04);
+    height: 6cqw;
+    display: flex;
+    align-items: center;
+    padding: 0 2cqw;
+    gap: 1.5cqw;
+  }
+
+  .timeline-label {
+    font-size: 1.1cqw;
+    font-weight: 800;
+    color: #1a2538;
+    text-transform: uppercase;
+    letter-spacing: 0.1cqw;
+    border-right: 0.15cqw solid #e4e9f0;
+    padding-right: 1.5cqw;
+  }
+
+  .timeline {
+    display: flex;
+    align-items: center;
+    gap: 0.8cqw;
+    flex: 1;
+    height: 100%;
+    overflow: hidden; 
+  }
+
+  /* --- STYLISH BOTTOM BAR --- */
+  .footer-wrapper {
+    height: 5cqw;
+    min-height: 5cqw;
+    position: relative;
+    background: linear-gradient(90deg, #0055ff, #00d2ff, #0055ff);
+    clip-path: polygon(1.5cqw 0, calc(100% - 1.5cqw) 0, 100% 100%, 0 100%);
+    padding: 0 0.15cqw 0.2cqw 0.15cqw; 
+  }
+
+  .footer-inner {
+    height: 100%;
+    background: linear-gradient(90deg, #010a1c, #07193d, #010a1c);
+    clip-path: polygon(1.4cqw 0, calc(100% - 1.4cqw) 0, 100% 100%, 0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.7cqw;
+    font-weight: 600;
+    position: relative;
+    letter-spacing: 0.05cqw;
+  }
+
+  .footer-inner::before, .footer-inner::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 25cqw;
+    background-image: radial-gradient(#0055ff 0.15cqw, transparent 0.15cqw);
+    background-size: 0.8cqw 0.8cqw;
+    background-position: 0 0;
+    z-index: 1;
+    opacity: 0.6;
+  }
+
+  .footer-inner::before {
+    left: 0;
+    mask-image: linear-gradient(90deg, black, transparent);
+    -webkit-mask-image: linear-gradient(90deg, black, transparent);
+  }
+
+  .footer-inner::after {
+    right: 0;
+    mask-image: linear-gradient(-90deg, black, transparent);
+    -webkit-mask-image: linear-gradient(-90deg, black, transparent);
+  }
+
+  .footer-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .f-blue { color: #00d2ff; font-weight: 800; font-family: var(--font-display); font-size: 2.2cqw; margin: 0 0.3cqw; vertical-align: middle; }
+  .f-yellow { color: #ffcc00; font-weight: 800; font-family: var(--font-display); font-size: 2.2cqw; margin: 0 0.3cqw; vertical-align: middle;}
+
+</style>
 </head>
 <body>
 
-  <div class="schedule-container">
+<div class="scoreboard-container">
+  
+  <header class="header">
+    <div class="header-left">
+      <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 003.61-2.96C19.08 10.63 21 8.55 21 6V7c0-1.1-.9-2-2-2zM7 11c-1.1 0-2-.9-2-2V7h2v4zm12-2c0 1.1-.9 2-2 2V7h2v2z"/></svg>
+      <span>INDIA T20</span>
+    </div>
+    <div class="header-center">
+      <div class="match-badge-wrapper">
+        <div class="match-badge">MATCH 01</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="live-indicator">
+        <div class="live-dot"></div>
+        <span>LIVE</span>
+      </div>
+      <div class="divider"></div>
+      <span>05:27 PM</span>
+    </div>
+  </header>
+
+  <main class="score-row">
+    <div class="team-card aus-card">
+      <div class="team-name-row">
+        <span class="team-name">AUS</span>
+        <svg class="team-icon" viewBox="0 0 24 24" fill="none" style="transform: rotate(20deg) translateY(-10%);">
+          <path d="M14.5 3.5L16.5 5.5L7.5 14.5C6 16 4 16.5 3 15.5C2 14.5 2.5 12.5 4 11L13 2L14.5 3.5Z" fill="#ffb400"/>
+          <path d="M16 2.5L17.5 4" stroke="#ffb400" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="18" cy="14" r="3" fill="#ff0044"/>
+          <path d="M16.5 13A2 2 0 0 1 19.5 15" stroke="white" stroke-width="1" stroke-linecap="round" stroke-dasharray="1 1"/>
+        </svg>
+      </div>
+      <div class="team-status">BATTING</div>
+    </div>
+
+    <div class="score-center">
+      <div class="main-runs">
+        <span>0</span> <span class="dash">-</span> <span>0</span>
+      </div>
+      <div class="overs-container">
+        <div class="overs-line"></div>
+        <div class="overs-pill">
+          <span class="overs-val">0.0</span> <span>OVERS</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="team-card ind-card">
+      <div class="team-name-row" style="justify-content: flex-end;">
+        <svg class="team-icon" viewBox="0 0 24 24" fill="none" style="transform: translateY(-10%);">
+          <circle cx="12" cy="12" r="10" fill="white"/>
+          <path d="M7 5C9 8 9 16 7 19" stroke="#ff0044" stroke-width="1.5" stroke-dasharray="2 2"/>
+          <path d="M17 5C15 8 15 16 17 19" stroke="#ff0044" stroke-width="1.5" stroke-dasharray="2 2"/>
+        </svg>
+        <span class="team-name">IND</span>
+      </div>
+      <div class="team-status">BOWLING</div>
+    </div>
+  </main>
+
+  <section class="stats-row">
+    <div class="stat-col c-need">
+      <div class="icon-wrapper">
+        <svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg>
+      </div>
+      <div class="stat-label">Needed Runs</div>
+      <div class="stat-value">27</div>
+    </div>
     
-    <!-- MATCH 1 -->
-    <div class="match-row">
-      <div class="team-card left">
-        <div class="team-name">Rising Stars</div>
-        <div class="team-address">Mumbai, MH</div>
+    <div class="stat-divider"></div>
+
+    <div class="stat-col c-balls">
+      <div class="icon-wrapper">
+        <svg viewBox="0 0 24 24"><circle cx="15" cy="12" r="6"/><path d="M2 12h5M4 8h4M4 16h4" stroke-width="2" stroke-linecap="round" stroke="currentColor"/></svg>
       </div>
-      
-      <div class="match-badge">
-        <div class="match-num">1</div>
-        <div class="match-time">- 8:00AM</div>
-      </div>
-      
-      <div class="team-card right">
-        <div class="team-name">Padupanambur Royals</div>
-        <div class="team-address">Mangaluru, KA</div>
-      </div>
+      <div class="stat-label">Remaining Balls</div>
+      <div class="stat-value">120</div>
     </div>
 
-    <!-- MATCH 3 -->
-    <div class="match-row">
-      <div class="team-card left">
-        <div class="team-name">Coastal Cricketers</div>
-        <div class="team-address">Udupi, KA</div>
-      </div>
-      
-      <div class="match-badge">
-        <div class="match-num">3</div>
-        <div class="match-time">9:30AM</div>
-      </div>
-      
-      <div class="team-card right">
-        <div class="team-name">Apoorva Puttur</div>
-        <div class="team-address">Puttur, KA</div>
-      </div>
-    </div>
+    <div class="stat-divider"></div>
 
-    <!-- MATCH 5 -->
-    <div class="match-row">
-      <div class="team-card left">
-        <div class="team-name">EG Vikings</div>
-        <div class="team-address">Bengaluru, KA</div>
+    <div class="stat-col c-crr">
+      <div class="icon-wrapper">
+        <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/><path d="M3 22h18v-2H3v2z"/></svg>
       </div>
-      
-      <div class="match-badge">
-        <div class="match-num">3</div>
-        <div class="match-time">11:00AM</div>
-      </div>
-      
-      <div class="team-card right">
-        <div class="team-name">Rising Stars</div>
-        <div class="team-address">Mumbai, MH</div>
-      </div>
+      <div class="stat-label">Current Run Rate</div>
+      <div class="stat-value">0.00</div>
     </div>
+    
+    <div class="stat-divider"></div>
 
+    <div class="stat-col c-rrr">
+      <div class="icon-wrapper">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.21.71 4.25 1.9 5.92L5.32 16.5C4.49 15.22 4 13.67 4 12c0-4.42 3.58-8 8-8s8 3.58 8 8c0 1.67-.49 3.22-1.32 4.5l1.42 1.42C21.29 16.25 22 14.21 22 12c0-5.52-4.48-10-10-10zm-1 12h2v4h-2zm1-8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+      </div>
+      <div class="stat-label">Required Run Rate</div>
+      <div class="stat-value">1.35</div>
+    </div>
+  </section>
+
+  <div class="timeline-wrapper">
+    <div class="timeline-label">Recent</div>
+    <div class="timeline" id="fs-timeline">
+      </div>
   </div>
+
+  <footer class="footer-wrapper">
+    <div class="footer-inner">
+      <div class="footer-content">
+        Target for AUS : <span class="f-blue">27</span> Runs from <span class="f-yellow">120</span> Balls
+      </div>
+    </div>
+  </footer>
+
+</div>
 
 </body>
 </html>
