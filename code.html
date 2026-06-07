@@ -11,8 +11,11 @@
       --text: #1a1a1a;
       --text-muted: #666;
       --accent: #0f5bfa;
+      --accent-hover: #0d4bc7;
       --danger: #dc3545;
+      --danger-hover: #b02a37;
       --success: #28a745;
+      --success-hover: #218838;
       --border: #e0e0e0;
       --warning: #ff9800;
       --offline: #9e9e9e;
@@ -21,6 +24,12 @@
       --code-text: #d4d4d4;
     }
     
+    /* Smooth Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--surface); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #bbb; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #999; }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--desktop-bg);
@@ -78,11 +87,11 @@
       border-radius: 6px;
       transition: all 0.3s;
     }
-    .dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--offline); }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--offline); transition: background-color 0.3s; }
     .is-blinking { animation: blink 1.2s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-    /* Fix for Preview Viewport */
+    /* Preview Viewport */
     .preview-wrapper {
       width: 100%;
       aspect-ratio: 16 / 9;
@@ -119,17 +128,20 @@
       cursor: pointer;
       color: var(--text-muted);
       text-align: center;
+      transition: all 0.2s ease;
     }
+    .tab-btn:hover { background: #e2e6ea; }
     .tab-btn.active {
       background: #eef4ff;
       border-color: var(--accent);
       color: var(--accent);
     }
 
-    .builder-section { display: none; width: 100%; }
+    .builder-section { display: none; width: 100%; animation: fadeIn 0.3s ease; }
     .builder-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Input Overflow Fixes */
+    /* Input Styling */
     .input-row { 
       display: flex; 
       gap: 10px; 
@@ -137,15 +149,18 @@
       width: 100%;
       box-sizing: border-box;
     }
-    .input-row input {
+    .input-row input, .full-input {
       flex: 1;
-      min-width: 0; /* Critical fix for flex blowout */
+      min-width: 0; 
       padding: 10px;
       border: 1px solid var(--border);
       border-radius: 6px;
       font-size: 13px;
       box-sizing: border-box;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
+    .full-input { width: 100%; margin-bottom: 10px; }
+    input:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15, 91, 250, 0.1); }
 
     .list-box {
       background: var(--surface);
@@ -153,6 +168,8 @@
       border-radius: 6px;
       padding: 10px;
       min-height: 50px;
+      max-height: 200px;
+      overflow-y: auto;
       margin-bottom: 10px;
       font-size: 12px;
       color: var(--text-muted);
@@ -170,22 +187,20 @@
       color: var(--text);
       font-weight: bold;
     }
-    .list-actions {
-      display: flex;
-      gap: 5px;
-    }
+    .list-actions { display: flex; gap: 5px; }
     .btn-icon {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      border-radius: 4px;
-      padding: 4px 8px;
-      font-size: 12px;
+      background: var(--surface); border: 1px solid var(--border);
+      cursor: pointer; border-radius: 4px; padding: 4px 8px; font-size: 12px; transition: background 0.2s;
     }
     .btn-icon:hover { background: #e0e0e0; }
 
-    .btn-add { background: var(--text); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px;}
-    .btn-gen { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
+    /* Standard Buttons */
+    .btn { border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: all 0.2s ease; }
+    .btn:active { transform: scale(0.98); }
+    .btn-add { background: var(--text); color: white; margin-bottom: 15px; }
+    .btn-add:hover { background: #333; }
+    .btn-gen { background: var(--accent); color: white; }
+    .btn-gen:hover { background: var(--accent-hover); }
 
     /* Unified Code Editor */
     textarea.code-input {
@@ -202,7 +217,6 @@
       box-sizing: border-box;
       line-height: 1.5;
     }
-    textarea.code-input:focus { outline: none; border-color: var(--accent); }
 
     /* Action Buttons (Forced Single Row) */
     .action-row {
@@ -224,14 +238,15 @@
       text-align: center;
       color: white;
       white-space: nowrap;
-      transition: 0.1s;
+      transition: all 0.2s ease;
     }
-    .btn-action:active { transform: scale(0.98); }
-    .btn-action:hover { filter: brightness(0.95); }
-    
+    .btn-action:active { transform: scale(0.96); }
     .btn-test { background: var(--accent); }
+    .btn-test:hover { background: var(--accent-hover); }
     .btn-pub { background: var(--success); }
+    .btn-pub:hover { background: var(--success-hover); }
     .btn-clear { background: var(--danger); }
+    .btn-clear:hover { background: var(--danger-hover); }
 
   </style>
 </head>
@@ -239,7 +254,6 @@
 
   <div class="app-container">
     
-    <!-- 1. Advanced Template Builder -->
     <div class="panel">
       <div class="panel-title">
         <span>Template Generators</span>
@@ -254,7 +268,6 @@
         <div class="tab-btn" onclick="switchTab('slider')" id="tab-slider">2. Auto Slider Overlay</div>
       </div>
 
-      <!-- Generator: Schedule -->
       <div class="builder-section active" id="sec-schedule">
         <div class="input-row">
           <input type="text" id="sch-t1n" placeholder="Team 1 Name">
@@ -267,31 +280,28 @@
         <div class="input-row">
           <input type="text" id="sch-time" placeholder="Match Time (e.g. 8:00AM)">
         </div>
-        <button class="btn-add" onclick="addMatch()">+ Add Match to List</button>
+        <button class="btn btn-add" onclick="addMatch()">+ Add Match to List</button>
         <div class="list-box" id="match-list">No matches added yet.</div>
-        <button class="btn-gen" onclick="generateSchedule()">Generate Schedule Code</button>
+        <button class="btn btn-gen" onclick="generateSchedule()">Generate Schedule Code</button>
       </div>
 
-      <!-- Generator: Slider -->
       <div class="builder-section" id="sec-slider">
-        <input type="text" id="sl-img" placeholder="Background Image URL (Leave empty for centered text)" style="width: 100%; box-sizing: border-box; margin-bottom:10px; padding: 10px; border:1px solid var(--border); border-radius:6px; font-size: 13px;">
+        <input type="text" id="sl-img" class="full-input" placeholder="Background Image URL (Leave empty for centered text)">
         <div class="input-row">
           <input type="text" id="sl-head" placeholder="Main Heading">
           <input type="text" id="sl-sub" placeholder="Sub Heading">
         </div>
-        <button class="btn-add" onclick="addSlide()">+ Add Slide to List</button>
+        <button class="btn btn-add" onclick="addSlide()">+ Add Slide to List</button>
         <div class="list-box" id="slide-list">No slides added yet.</div>
-        <button class="btn-gen" onclick="generateSlider()">Generate Slider Code</button>
+        <button class="btn btn-gen" onclick="generateSlider()">Generate Slider Code</button>
       </div>
     </div>
 
-    <!-- 2. Code Editor Panel -->
     <div class="panel">
       <div class="panel-title"><span>Unified HTML/CSS/JS Editor</span></div>
-      <textarea id="unifiedCode" class="code-input" placeholder="<!-- Generated code will appear here, or write your own -->"></textarea>
+      <textarea id="unifiedCode" class="code-input" placeholder=""></textarea>
     </div>
 
-    <!-- 3. Preview Monitor Panel -->
     <div class="panel">
       <div class="panel-title"><span style="color: var(--accent);">Live Preview Monitor</span></div>
       <div class="preview-wrapper">
@@ -299,7 +309,6 @@
       </div>
     </div>
 
-    <!-- 4. One-Row Action Buttons -->
     <div class="action-row">
       <button class="btn-action btn-test" onclick="renderPreview()">Test Preview</button>
       <button class="btn-action btn-pub" onclick="publishToLive()">Publish Live</button>
@@ -310,7 +319,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
-    import { getDatabase, ref, update, get, onValue, goOnline, goOffline } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
+    import { getDatabase, ref, update, get, onValue } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBmXewXcQQt97EJzbKceLbCoTTG_9aJlJI",
@@ -330,6 +339,13 @@
     const unifiedInput = document.getElementById('unifiedCode');
     const previewFrame = document.getElementById('previewFrame');
     let isConnected = false;
+
+    // Auto-Preview Debounce Logic
+    let previewTimeout;
+    unifiedInput.addEventListener('input', () => {
+      clearTimeout(previewTimeout);
+      previewTimeout = setTimeout(() => renderPreview(), 500); // Auto-updates preview 500ms after typing stops
+    });
 
     // Connection Status
     function updateBadge(text, color, blink) {
@@ -355,7 +371,7 @@
       get(matchRef).then((snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
-          if (data.rawCustomCode && data.rawCustomCode.combined) {
+          if (data.rawCustomCode && data.rawCustomCode.combined && !unifiedInput.value) {
             unifiedInput.value = data.rawCustomCode.combined;
             renderPreview();
           }
@@ -383,31 +399,42 @@
     let matches = [];
     let slides = [];
 
+    // Local Storage Data Persistence
+    function saveDrafts() {
+      localStorage.setItem('cgs_matches', JSON.stringify(matches));
+      localStorage.setItem('cgs_slides', JSON.stringify(slides));
+    }
+
+    function loadDrafts() {
+      const m = localStorage.getItem('cgs_matches');
+      const s = localStorage.getItem('cgs_slides');
+      if (m) { matches = JSON.parse(m); renderMatchList(); }
+      if (s) { slides = JSON.parse(s); renderSlideList(); }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadDrafts);
+
     window.switchTab = (tab) => {
-      document.getElementById('tab-schedule').classList.remove('active');
-      document.getElementById('tab-slider').classList.remove('active');
-      document.getElementById('sec-schedule').classList.remove('active');
-      document.getElementById('sec-slider').classList.remove('active');
-      
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.builder-section').forEach(sec => sec.classList.remove('active'));
       document.getElementById(`tab-${tab}`).classList.add('active');
       document.getElementById(`sec-${tab}`).classList.add('active');
     }
 
     // MATCH SCHEDULE LOGIC
     window.addMatch = () => {
-      const t1n = document.getElementById('sch-t1n').value;
-      const t1a = document.getElementById('sch-t1a').value;
-      const t2n = document.getElementById('sch-t2n').value;
-      const t2a = document.getElementById('sch-t2a').value;
-      const time = document.getElementById('sch-time').value;
+      const t1n = document.getElementById('sch-t1n').value.trim();
+      const t1a = document.getElementById('sch-t1a').value.trim();
+      const t2n = document.getElementById('sch-t2n').value.trim();
+      const t2a = document.getElementById('sch-t2a').value.trim();
+      const time = document.getElementById('sch-time').value.trim();
       
       if(!t1n || !t2n) return alert("Enter team names");
       matches.push({t1n, t1a, t2n, t2a, time});
+      saveDrafts();
       renderMatchList();
       
-      document.getElementById('sch-t1n').value = ''; document.getElementById('sch-t1a').value = '';
-      document.getElementById('sch-t2n').value = ''; document.getElementById('sch-t2a').value = '';
-      document.getElementById('sch-time').value = '';
+      ['sch-t1n', 'sch-t1a', 'sch-t2n', 'sch-t2a', 'sch-time'].forEach(id => document.getElementById(id).value = '');
     }
 
     window.editMatch = (index) => {
@@ -418,11 +445,13 @@
       document.getElementById('sch-t2a').value = m.t2a;
       document.getElementById('sch-time').value = m.time;
       matches.splice(index, 1);
+      saveDrafts();
       renderMatchList();
     }
 
     window.deleteMatch = (index) => {
       matches.splice(index, 1);
+      saveDrafts();
       renderMatchList();
     }
 
@@ -444,20 +473,20 @@
       if(matches.length === 0) return alert("Add matches first");
       
       let htmlRows = matches.map((m, i) => `
-    <div class="match-row" style="animation-delay: ${0.1 + (i * 0.15)}s">
-      <div class="team-card left">
-        <div class="team-name">${m.t1n}</div>
-        <div class="team-address">${m.t1a}</div>
-      </div>
-      <div class="match-badge">
-        <div class="match-num">${i+1}</div>
-        <div class="match-time">${m.time}</div>
-      </div>
-      <div class="team-card right">
-        <div class="team-name">${m.t2n}</div>
-        <div class="team-address">${m.t2a}</div>
-      </div>
-    </div>`).join('\n');
+      <div class="match-row" style="animation-delay: ${0.1 + (i * 0.15)}s">
+        <div class="team-card left">
+          <div class="team-name">${m.t1n}</div>
+          <div class="team-address">${m.t1a}</div>
+        </div>
+        <div class="match-badge">
+          <div class="match-num">${i+1}</div>
+          <div class="match-time">${m.time}</div>
+        </div>
+        <div class="team-card right">
+          <div class="team-name">${m.t2n}</div>
+          <div class="team-address">${m.t2a}</div>
+        </div>
+      </div>`).join('\n');
 
       const template = `<!DOCTYPE html>
 <html lang="en">
@@ -468,28 +497,16 @@
       --orange-top: #ffcf00; --orange-bottom: #f57c00; --orange-border: #ffecb3; --orange-shadow: rgba(245, 124, 0, 0.6);
       --card-bg-top: #ffffff; --card-bg-bottom: #e6ebf0; --text-dark: #111111; --text-muted: #555555;
     }
-    
-    /* Zero Margins & Hidden Overflow */
     body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background: transparent; font-family: 'Arial Black', -apple-system, sans-serif; }
-    
-    /* PERFECT 1080p CANVAS */
-    #canvas { 
-      width: 1920px; height: 1080px; position: absolute; top: 50%; left: 50%; 
-      transform: translate(-50%, -50%); transform-origin: center center; 
-      display: flex; align-items: center; justify-content: center; 
-    }
-    
+    #canvas { width: 1920px; height: 1080px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); transform-origin: center center; display: flex; align-items: center; justify-content: center; }
     .schedule-container { width: 100%; max-width: 90%; display: flex; flex-direction: column; gap: 35px; }
     .match-row { display: flex; align-items: center; justify-content: space-between; position: relative; width: 100%; opacity: 0; animation: fadeSlideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
     @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    
     .team-card { width: 48.5%; background: linear-gradient(180deg, var(--card-bg-top) 0%, var(--card-bg-bottom) 100%); border-radius: 20px; border: 1px solid #ffffff; border-bottom: 4px solid var(--text-muted); padding: 28px 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: cyanGlow 3s infinite alternate ease-in-out; }
     @keyframes cyanGlow { from { box-shadow: 0 0 5px var(--cyan-shadow); } to { box-shadow: 0 0 20px var(--cyan-glow); border-bottom-color: var(--cyan-glow); } }
     .team-card.left { padding-right: 70px; } .team-card.right { padding-left: 70px; }
-    
     .team-name { font-size: 40px; font-weight: 900; color: var(--text-dark); letter-spacing: 0.5px; line-height: 1.1; text-align: center; }
     .team-address { font-family: 'Segoe UI', Roboto, sans-serif; font-size: 24px; font-weight: 800; color: var(--text-muted); margin-top: 6px; letter-spacing: 1px; text-align: center; }
-    
     @keyframes badgePulse { 0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 6px 15px var(--orange-shadow), inset 0 2px 4px rgba(255,255,255,0.4); } 100% { transform: translate(-50%, -50%) scale(1.05); box-shadow: 0 10px 30px var(--orange-bottom), inset 0 2px 8px rgba(255,255,255,0.6); } }
     .match-badge { position: absolute; left: 50%; top: 50%; z-index: 10; background: linear-gradient(180deg, var(--orange-top) 0%, var(--orange-bottom) 100%); border: 2px solid var(--orange-border); border-radius: 8px; padding: 8px 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 110px; animation: badgePulse 2s infinite alternate ease-in-out; }
     .match-num { font-size: 64px; font-weight: 900; color: var(--text-dark); line-height: 1; margin-bottom: 2px; text-shadow: 1px 1px 2px rgba(255,255,255,0.5); }
@@ -513,14 +530,16 @@ ${htmlRows}
 
     // SLIDER LOGIC
     window.addSlide = () => {
-      const img = document.getElementById('sl-img').value;
-      const head = document.getElementById('sl-head').value;
-      const sub = document.getElementById('sl-sub').value;
+      const img = document.getElementById('sl-img').value.trim();
+      const head = document.getElementById('sl-head').value.trim();
+      const sub = document.getElementById('sl-sub').value.trim();
+      
       if(!img && !head && !sub) return alert("Enter content for the slide");
       slides.push({img, head, sub});
+      saveDrafts();
       renderSlideList();
       
-      document.getElementById('sl-img').value = ''; document.getElementById('sl-head').value = ''; document.getElementById('sl-sub').value = '';
+      ['sl-img', 'sl-head', 'sl-sub'].forEach(id => document.getElementById(id).value = '');
     }
 
     window.editSlide = (index) => {
@@ -529,11 +548,13 @@ ${htmlRows}
       document.getElementById('sl-head').value = s.head;
       document.getElementById('sl-sub').value = s.sub;
       slides.splice(index, 1);
+      saveDrafts();
       renderSlideList();
     }
 
     window.deleteSlide = (index) => {
       slides.splice(index, 1);
+      saveDrafts();
       renderSlideList();
     }
 
@@ -562,14 +583,15 @@ ${htmlRows}
         if (s.img) content += `<img src="${s.img}" class="slide-bg">`;
         if (s.head || s.sub) {
           const alignClass = s.img ? 'box-bottom' : 'box-center';
-          content += `<div class="slide-content ${alignClass}">
-            <div class="text-box">
-              ${s.head ? `<div class="head">${s.head}</div>` : ''}
-              ${s.sub ? `<div class="sub">${s.sub}</div>` : ''}
-            </div>
-          </div>`;
+          content += `
+        <div class="slide-content ${alignClass}">
+          <div class="text-box">
+            ${s.head ? `<div class="head">${s.head}</div>` : ''}
+            ${s.sub ? `<div class="sub">${s.sub}</div>` : ''}
+          </div>
+        </div>`;
         }
-        return `<div class="slide" style="animation-delay: ${i * 6}s">${content}</div>`;
+        return `      <div class="slide" style="animation-delay: ${i * 6}s">${content}\n      </div>`;
       }).join('\n');
 
       const template = `<!DOCTYPE html>
@@ -578,22 +600,17 @@ ${htmlRows}
   <style>
     body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background: transparent; font-family: 'Arial Black', sans-serif; }
     #canvas { width: 1920px; height: 1080px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); transform-origin: center center; }
-    
     .slider-wrap { width: 100%; height: 100%; position: relative; }
     .slide { position: absolute; width: 100%; height: 100%; opacity: 0; animation: fadeLoop ${totalTime}s infinite; }
-    
     @keyframes fadeLoop {
       0%, 2% { opacity: 0; transform: scale(1.05); }
       5%, ${(pctStep - 2).toFixed(2)}% { opacity: 1; transform: scale(1); }
       ${pctStep.toFixed(2)}%, 100% { opacity: 0; transform: scale(1); }
     }
-    
     .slide-bg { position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; object-fit: cover; z-index: 1; }
-    
     .slide-content { position: absolute; z-index: 2; width: 100%; height: 100%; display: flex; flex-direction: column; }
     .box-bottom { justify-content: flex-end; align-items: center; padding-bottom: 120px; box-sizing: border-box; }
     .box-center { justify-content: center; align-items: center; }
-    
     .text-box { background: rgba(0,0,0,0.65); padding: 50px 100px; border-radius: 24px; text-align: center; border: 4px solid #fff; box-shadow: 0 20px 50px rgba(0,0,0,0.5); backdrop-filter: blur(10px);}
     .head { font-size: 110px; color: #fff; line-height: 1.1; text-transform: uppercase; margin-bottom: 10px; }
     .sub { font-size: 55px; color: #00d2ff; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;}
