@@ -5,25 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Broadcast Control</title>
   <style>
+    /* HISAPBOOK DESIGN SYSTEM (Pure CSS) */
     :root {
-      --bg: #ffffff;
-      --surface: #f4f6f8;
-      --text: #1a1a1a;
-      --text-muted: #666;
-      --accent: #0f5bfa;
-      --danger: #dc3545;
-      --success: #28a745;
-      --border: #e0e0e0;
-      --warning: #ff9800;
-      --offline: #9e9e9e;
-      --desktop-bg: #e9ecef;
+      --bg-body: #f1f5f9;       /* slate-100 */
+      --bg-card: #ffffff;
+      --text-main: #1e293b;     /* slate-800 */
+      --text-muted: #64748b;    /* slate-500 */
+      --text-light: #94a3b8;    /* slate-400 */
+      --accent: #4f46e5;        /* indigo-600 */
+      --accent-hover: #4338ca;  /* indigo-700 */
+      --accent-light: #e0e7ff;  /* indigo-50 */
+      --danger: #e11d48;        /* rose-600 */
+      --danger-hover: #be123c;  /* rose-700 */
+      --danger-light: #ffe4e6;  /* rose-50 */
+      --success: #10b981;       /* emerald-500 */
+      --success-hover: #059669; /* emerald-600 */
+      --warning: #f59e0b;       /* amber-500 */
+      --border: #e2e8f0;        /* slate-200 */
+      --border-focus: #4f46e5;
     }
     
-    /* MOBILE FIRST BASE STYLES */
+    /* BASE STYLES */
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--desktop-bg);
-      color: var(--text);
+      background-color: var(--bg-body);
+      color: var(--text-main);
       margin: 0;
       padding: 0;
       display: flex;
@@ -38,215 +44,317 @@
       max-width: 1000px;
       display: flex;
       flex-direction: column;
-      gap: 0; 
-      flex-grow: 1;
-    }
-
-    .panel {
-      background: var(--bg);
+      gap: 20px; 
       padding: 20px;
-      border-radius: 0;
-      box-shadow: none;
-      border: none;
-      border-bottom: 1px solid var(--border);
-    }
-    .panel:last-child {
-      border-bottom: none;
-      flex-grow: 1; 
+      box-sizing: border-box;
     }
 
-    .panel-title {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 15px;
-      border-bottom: 2px solid var(--surface);
-      padding-bottom: 10px;
+    /* CARDS */
+    .config-card {
+      background: var(--bg-card);
+      padding: 24px;
+      border-radius: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+      transition: box-shadow 0.3s ease;
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 20px;
+    }
+    .card-header::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 20px;
+      border-radius: 999px;
+    }
+    
+    .card-status .card-header::before { background-color: var(--text-light); }
+    .card-scenes .card-header::before { background-color: var(--accent); }
+    .card-effects .card-header::before { background-color: var(--danger); }
+    .card-branding .card-header::before { background-color: var(--success); }
+    .card-custom .card-header::before { background-color: var(--warning); }
+
+    /* HEADER & STATUS BADGE */
+    .header-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      width: 100%;
     }
-
     #systemStatusText {
-      transition: color 0.3s ease;
+      font-size: 14px;
+      font-weight: 700;
       text-transform: capitalize;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
     }
-
     .live-badge {
       display: flex;
       align-items: center;
       gap: 6px;
       font-size: 12px;
-      font-weight: bold;
-      color: var(--offline);
-      padding: 4px 10px;
-      border-radius: 6px;
+      font-weight: 800;
+      color: var(--text-light);
+      padding: 6px 12px;
+      background: var(--bg-body);
+      border-radius: 999px;
       transition: all 0.3s;
     }
     .dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background-color: var(--offline);
+      background-color: var(--text-light);
       transition: background-color 0.3s;
     }
-    .is-blinking {
-      animation: blink 1.2s infinite;
-    }
+    .is-blinking .dot { animation: blink 1.2s infinite; }
     @keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.3; }
     }
 
-    /* Input & Form Styling */
-    input, select, textarea {
+    /* FLOATING LABEL INPUTS */
+    .input-wrapper {
+      position: relative;
       width: 100%;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .input-field {
+      width: 100%;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      background: var(--bg-card);
+      border: 1px solid #d1d5db; /* gray-300 */
+      border-radius: 16px;
       box-sizing: border-box;
-      background: var(--bg);
-      font-family: inherit;
-      margin-bottom: 12px;
-      font-size: 14px;
-    }
-    input:focus, textarea:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(15, 91, 250, 0.1);
+      transition: all 0.3s;
+      font-family: inherit;
     }
-    input[type="checkbox"] {
-      width: 22px;
-      height: 22px;
-      margin-right: 10px;
-      margin-bottom: 0;
-      cursor: pointer;
-      accent-color: var(--accent);
+    textarea.input-field {
+      resize: vertical;
+      min-height: 100px;
     }
-
-    label {
-      display: block;
+    .input-field:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+    .input-label {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--bg-card);
+      padding: 0 4px;
+      color: #6b7280; /* gray-500 */
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      border-radius: 4px;
+    }
+    textarea.input-field + .input-label {
+      top: 24px;
+    }
+    .input-field:focus + .input-label,
+    .input-field:not(:placeholder-shown) + .input-label {
+      top: 0;
       font-size: 12px;
-      font-weight: bold;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: var(--border-focus);
+      transform: translateY(-50%) scale(0.9);
+      font-weight: 700;
     }
 
+    /* Specific fix for datetime-local floating label */
+    input[type="datetime-local"].input-field + .input-label {
+      top: 0;
+      font-size: 12px;
+      transform: translateY(-50%) scale(0.9);
+      font-weight: 700;
+      color: #6b7280;
+    }
+    input[type="datetime-local"].input-field:focus + .input-label {
+      color: var(--border-focus);
+    }
+
+    /* Responsive Input Groups */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .input-group > div { flex: 1; }
+
+    /* ANIMATED TOGGLE SWITCH */
     .toggle-wrapper {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       cursor: pointer;
-      font-size: 14px;
-      font-weight: bold;
-      color: var(--text);
-      text-transform: none;
-      letter-spacing: 0;
-      background: var(--bg);
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-
-    button {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 15px 0;
-      border-radius: 8px;
       font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.1s;
+      font-weight: 700;
+      color: var(--text-main);
+      background: var(--bg-body);
+      padding: 16px 20px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+      transition: 0.3s;
     }
-    button:active { transform: scale(0.98); }
-    button:hover { background: #e9ecef; }
+    .toggle-wrapper:hover {
+      background: var(--border);
+    }
+    .custom-toggle {
+      appearance: none;
+      width: 48px;
+      height: 28px;
+      background: #cbd5e1;
+      border-radius: 999px;
+      position: relative;
+      cursor: pointer;
+      outline: none;
+      transition: background-color 0.3s;
+      margin: 0;
+    }
+    .custom-toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .custom-toggle:checked { background: var(--accent); }
+    .custom-toggle:checked::after { transform: translateX(20px); }
 
-    /* Scene Grid */
+    /* BUTTONS */
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    .btn:active { transform: scale(0.96); }
+
+    .btn-action {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+    }
+    .btn-action:hover { background: var(--accent-hover); }
+
+    .btn-success {
+      background: var(--text-main);
+      color: white;
+      box-shadow: 0 10px 15px -3px rgba(30, 41, 59, 0.3);
+    }
+    .btn-success:hover { background: #000000; }
+    
+    .btn-placeholder {
+      background: var(--bg-body);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0 16px;
+      height: 52px;
+      border-radius: 16px;
+      white-space: nowrap;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    /* SCENE GRID */
     .scene-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      gap: 12px;
     }
     .scene-btn {
-      font-size: 13px;
-      padding: 12px;
-      background: var(--bg);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 16px;
+      padding: 16px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      text-align: left;
     }
     .scene-btn.active {
-      border-color: var(--accent);
+      background: var(--accent-light);
       color: var(--accent);
-      background: #f0f7ff;
-      box-shadow: 0 2px 8px rgba(15, 91, 250, 0.15);
+      border-color: #c7d2fe; /* indigo-200 */
     }
 
-    /* Effects Row */
+    /* EFFECTS ROW */
     .effect-row {
       display: flex;
-      gap: 10px;
+      gap: 12px;
+      margin-bottom: 20px;
     }
     .btn-fx {
-      background: #343a40;
-      color: white;
-      font-size: 13px;
       flex: 1;
-      padding: 12px;
-      border: none;
-    }
-    .btn-fx:hover { filter: brightness(1.1); }
-    
-    .btn-action {
-      background: #1a1a1a;
+      padding: 16px 0;
+      border-radius: 16px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       color: white;
       border: none;
-      padding: 14px;
-      border-radius: 8px;
-      width: 100%;
       cursor: pointer;
-      font-weight: bold;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      transition: transform 0.2s, filter 0.2s;
     }
-    .btn-success { background: var(--success); color: white; }
-    .btn-success:hover { background: #218838; }
+    .btn-fx:active { transform: scale(0.94); }
+    .btn-fx:hover { filter: brightness(1.1); }
 
-    .input-group {
-      display: flex;
-      gap: 10px;
+    /* Custom Labels (for small section titles) */
+    .section-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-light);
+      font-weight: 800;
+      margin-bottom: 12px;
+      display: block;
     }
-    .input-group > div { flex: 1; }
-    .input-group > input { margin-bottom: 12px; }
-
-    /* THEMATIC CONFIGURATION CARDS */
-    .config-card {
-      padding: 16px;
-      border-radius: 10px;
-      margin-bottom: 15px;
-    }
-    
-    .card-scenes { background: #f8f9fa; border: 1px solid #e9ecef; border-left: 5px solid var(--text); }
-    .card-effects { background: #fff5f6; border: 1px solid #ffebee; border-left: 5px solid var(--danger); } /* Lightened */
-    .card-branding { background: #f0f4ff; border: 1px solid #cce0ff; border-left: 5px solid var(--accent); }
-    .card-custom { background: #f5f5f5; border: 1px solid #e0e0e0; border-left: 5px solid #616161; }
 
     /* DESKTOP RESPONSIVENESS */
     @media (min-width: 768px) {
-      body {
-        padding: 20px 0;
-        justify-content: center;
-      }
+      body { padding: 40px 0; }
       .app-container {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        flex-grow: 0;
+        align-items: start;
+        padding: 0;
       }
-      .panel {
-        border-radius: 16px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-        border: 1px solid var(--border);
-      }
-      .scene-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
+      .scene-grid { grid-template-columns: repeat(3, 1fr); }
+      .input-group { flex-direction: row; }
     }
   </style>
 </head>
@@ -254,19 +362,20 @@
 
   <div class="app-container" id="main-app">
     
-    <!-- LEFT COLUMN: Live Controls -->
-    <div class="panel">
-      <div class="panel-title">
-        <span id="systemStatusText"></span>
-        <div class="live-badge" id="topBadge">
-          <div class="dot" id="topBadgeDot"></div>
-          <span id="topBadgeText"></span>
+    <div class="column-left">
+      
+      <div class="config-card card-status">
+        <div class="header-content">
+          <span id="systemStatusText">Control Panel</span>
+          <div class="live-badge" id="topBadge">
+            <div class="dot" id="topBadgeDot"></div>
+            <span id="topBadgeText">CONNECTING</span>
+          </div>
         </div>
       </div>
 
-      <!-- Card: Scenes -->
       <div class="config-card card-scenes">
-        <label style="color: var(--text);">Active Scene Switcher</label>
+        <div class="card-header">Scene Switcher</div>
         <div class="scene-grid">
           <button class="scene-btn active" id="btn-scene-live" onclick="setScene('live')">1. Live Score</button>
           <button class="scene-btn" id="btn-scene-timer" onclick="setScene('timer')">2. Pre-Match</button>
@@ -276,68 +385,88 @@
         </div>
       </div>
 
-      <!-- Combined Card: Resolution, Screen FX, Visual FX (Moved below Scenes) -->
       <div class="config-card card-effects" style="margin-bottom: 0;">
-        <label style="color: var(--danger); font-size: 14px; margin-bottom: 12px;">Match Actions & Effects</label>
+        <div class="card-header">Match Actions</div>
         
-        <label>Visual Effects</label>
-        <label class="toggle-wrapper" style="border-color: #ffcdd2; margin-bottom: 15px;">
-          <input type="checkbox" id="particleToggle">
-          Show Background Particles
+        <label class="toggle-wrapper">
+          <span>Background Particles</span>
+          <input type="checkbox" id="particleToggle" class="custom-toggle">
         </label>
 
-        <label>Screen Effects</label>
-        <div class="effect-row" style="margin-bottom: 15px;">
-          <button class="btn-fx" style="background: #0d47a1" onclick="triggerEffect('FOUR')">Four</button>
-          <button class="btn-fx" style="background: #ad00b9" onclick="triggerEffect('SIX')">Six</button>
+        <span class="section-label">Screen Effects</span>
+        <div class="effect-row">
+          <button class="btn-fx" style="background: var(--accent)" onclick="triggerEffect('FOUR')">Four</button>
+          <button class="btn-fx" style="background: #8b5cf6" onclick="triggerEffect('SIX')">Six</button>
           <button class="btn-fx" style="background: var(--danger);" onclick="triggerEffect('OUT')">Out</button>
         </div>
 
-        <label>Match Resolution</label>
-        <button class="btn-action btn-success" onclick="declareResult()">Declare Winner / Result</button>
+        <span class="section-label">Match Resolution</span>
+        <button class="btn btn-success" onclick="declareResult()">Declare Winner / Result</button>
       </div>
 
     </div>
 
-    <!-- RIGHT COLUMN: Setup & Configuration -->
-    <div class="panel">
+    <div class="column-right">
       
-      <!-- Combined Card: Status, Branding, Timer (Moved to Right Column for balance) -->
       <div class="config-card card-branding">
-        <label style="color: var(--accent); font-size: 14px; margin-bottom: 12px;">Match Status & Overlays</label>
+        <div class="card-header">Status & Overlays</div>
         
-        <label>Live Status</label>
-        <input type="text" id="statusBar" placeholder="e.g. IND won toss" style="border-color: #b3d1ff;">
-
-        <label>Top-Left Branding</label>
-        <div class="input-group">
-          <input type="text" id="brandTitle" placeholder="Heading" style="border-color: #b3d1ff;">
-          <input type="text" id="brandSub" placeholder="Sub-text" style="border-color: #b3d1ff;">
+        <div class="input-wrapper">
+          <input type="text" id="statusBar" class="input-field" placeholder=" ">
+          <label for="statusBar" class="input-label">Live Status Bar Text</label>
         </div>
-        <input type="text" id="brandLogo" placeholder="Logo URL" style="border-color: #b3d1ff;">
 
-        <label>Timer Settings</label>
-        <div style="display: flex; gap: 10px;">
-          <!-- 3:1 Ratio for Timer inputs -->
-          <input type="text" id="timerMessage" placeholder="Prefix" value="Starting in" style="flex: 3; border-color: #b3d1ff; margin-bottom: 0;">
-          <input type="datetime-local" id="timerTarget" style="flex: 1; border-color: #b3d1ff; margin-bottom: 0;">
+        <div class="input-group">
+          <div class="input-wrapper">
+            <input type="text" id="brandTitle" class="input-field" placeholder=" ">
+            <label for="brandTitle" class="input-label">Top-Left Heading</label>
+          </div>
+          <div class="input-wrapper">
+            <input type="text" id="brandSub" class="input-field" placeholder=" ">
+            <label for="brandSub" class="input-label">Sub-text</label>
+          </div>
+        </div>
+
+        <div class="input-wrapper">
+          <input type="text" id="brandLogo" class="input-field" placeholder=" ">
+          <label for="brandLogo" class="input-label">Logo Image URL</label>
+        </div>
+
+        <span class="section-label">Timer Settings</span>
+        <div class="input-wrapper">
+          <input type="text" id="timerMessage" class="input-field" placeholder=" " value="Starting in">
+          <label for="timerMessage" class="input-label">Timer Prefix</label>
+        </div>
+        <div class="input-wrapper" style="margin-bottom: 0;">
+          <input type="datetime-local" id="timerTarget" class="input-field" placeholder=" ">
+          <label for="timerTarget" class="input-label">Target Time</label>
         </div>
       </div>
 
-      <!-- Card: Custom Graphics -->
       <div class="config-card card-custom" style="margin-bottom: 0;">
-        <label style="color: #616161; font-size: 14px; margin-bottom: 12px;">Custom Graphic Module</label>
+        <div class="card-header">Custom Graphic Module</div>
         
-        <div style="display: flex; gap: 6px; align-items: flex-start;">
-          <input type="text" id="customImg" placeholder="Image URL" style="flex-grow: 1; border-color: #e0e0e0;">
-          <button type="button" onclick="document.getElementById('customImg').value='https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1305&auto=format&fit=crop'; document.getElementById('customImg').dispatchEvent(new Event('change'));" style="padding: 0 12px; height: 42px; font-size: 11px; white-space: nowrap; border-radius: 8px; background: #e2e6ea; margin-bottom: 12px; border: 1px solid var(--border);">Placeholder</button>
+        <div style="display: flex; gap: 12px; align-items: flex-start; margin-bottom: 16px;">
+          <div class="input-wrapper" style="margin-bottom: 0; flex-grow: 1;">
+            <input type="text" id="customImg" class="input-field" placeholder=" ">
+            <label for="customImg" class="input-label">Main Image URL</label>
+          </div>
+          <button type="button" class="btn-placeholder" onclick="document.getElementById('customImg').value='https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1305&auto=format&fit=crop'; document.getElementById('customImg').dispatchEvent(new Event('change'));">Demo Image</button>
         </div>
         
-        <input type="text" id="customTitle" placeholder="Main Heading" style="border-color: #e0e0e0;">
-        <input type="text" id="customText" placeholder="Sub-text" style="border-color: #e0e0e0;">
+        <div class="input-wrapper">
+          <input type="text" id="customTitle" class="input-field" placeholder=" ">
+          <label for="customTitle" class="input-label">Main Heading</label>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" id="customText" class="input-field" placeholder=" ">
+          <label for="customText" class="input-label">Sub-text Description</label>
+        </div>
         
-        <label style="font-size: 11px; margin-top: 5px; color: #616161;">HTML/CSS Injector</label>
-        <textarea id="customHtml" placeholder="<div>Live</div>&#10;<style> body { background: none; } </style>" rows="4" style="font-family: monospace; font-size: 12px; resize: vertical; margin-bottom: 0; background: #1e1e1e; color: #d4d4d4; border-color: #333;"></textarea>
+        <div class="input-wrapper" style="margin-bottom: 0;">
+          <textarea id="customHtml" class="input-field" placeholder=" " rows="3"></textarea>
+          <label for="customHtml" class="input-label">Advanced HTML/CSS Injector</label>
+        </div>
       </div>
 
     </div>
@@ -422,11 +551,11 @@
         updateBadge("OFFLINE", "var(--warning)", false);
         sysStatus.innerText = "Saving Offline"; sysStatus.style.color = "var(--warning)";
       } else if (!isConnected) {
-        updateBadge("NO DB", "var(--accent)", false);
-        sysStatus.innerText = "No Server"; sysStatus.style.color = "var(--accent)";
+        updateBadge("NO DB", "var(--warning)", false);
+        sysStatus.innerText = "No Server"; sysStatus.style.color = "var(--warning)";
       } else {
         updateBadge("LIVE", "var(--danger)", true);
-        sysStatus.innerText = "Control Panel"; sysStatus.style.color = "var(--text)";
+        sysStatus.innerText = "Control Panel"; sysStatus.style.color = "var(--text-main)";
         if (needsSync) {
           set(matchRef, state); needsSync = false;
         }
@@ -480,7 +609,9 @@
     function updateUI() {
       const safeUpdate = (id, value) => {
         const el = document.getElementById(id); 
-        if (el && document.activeElement !== el) el.value = value ?? "";
+        if (el && document.activeElement !== el) {
+          el.value = value ?? "";
+        }
       };
       safeUpdate('statusBar', state.statusBar); 
       safeUpdate('timerMessage', state.timerMessage); 
