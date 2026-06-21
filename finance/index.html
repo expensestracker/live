@@ -11,6 +11,117 @@
   <link rel="preload" href="sans-display.woff2" as="font" type="font/woff2" crossorigin>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* HISAPBOOK DESIGN SYSTEM (Imported Input & Card Styles) */
+    :root {
+      --bg-body: #f1f5f9;
+      --bg-card: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --border: #e2e8f0;
+      --border-focus: #4f46e5;
+    }
+
+    /* CARDS */
+    .config-card {
+      background: var(--bg-card);
+      padding: 24px;
+      border-radius: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+      transition: box-shadow 0.3s ease;
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .card-header::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 20px;
+      border-radius: 999px;
+      background-color: var(--accent);
+    }
+
+    /* FLOATING LABEL INPUTS */
+    .input-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    .input-field {
+      width: 100%;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      background: var(--bg-card);
+      border: 1px solid #d1d5db;
+      border-radius: 16px;
+      box-sizing: border-box;
+      outline: none;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+    .input-field:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+    .input-label {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--bg-card);
+      padding: 0 4px;
+      color: #6b7280;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      border-radius: 4px;
+      z-index: 5;
+    }
+    .input-field:focus ~ .input-label,
+    .input-field:not(:placeholder-shown) ~ .input-label {
+      top: 0;
+      font-size: 12px;
+      color: var(--border-focus);
+      transform: translateY(-50%) scale(0.9);
+      font-weight: 700;
+    }
+
+    /* Specific fix for date and select floating label */
+    input[type="date"].input-field ~ .input-label,
+    select.input-field ~ .input-label {
+      top: 0;
+      font-size: 12px;
+      transform: translateY(-50%) scale(0.9);
+      font-weight: 700;
+      color: #6b7280;
+    }
+    input[type="date"].input-field:focus ~ .input-label,
+    select.input-field:focus ~ .input-label {
+      color: var(--border-focus);
+    }
+
+    /* Fix for inputs with left icons */
+    .has-left-icon .input-label {
+      left: 42px;
+    }
+    .has-left-icon .input-field:focus ~ .input-label,
+    .has-left-icon .input-field:not(:placeholder-shown) ~ .input-label {
+      left: 14px;
+    }
+  </style>
 </head>
 <body class="font-sans">
 
@@ -45,21 +156,21 @@
       </section>
     </div>
 
-    <div class="w-full max-w-md mx-auto lg:mx-0 bg-white rounded-t-3xl lg:rounded-[2.5rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.08)] border border-slate-100 border-b-0 lg:border-b text-slate-800 p-8 pb-20 lg:p-10 mt-auto lg:mt-0">
-      <div class="text-center mb-6">
-        <h2 id="auth-title" class="text-2xl font-bold text-slate-800">Admin Access</h2>
+    <div class="w-full max-w-md mx-auto lg:mx-0 config-card border-b-0 lg:border-b mt-auto lg:mt-0 pb-20 lg:pb-8">
+      <div class="flex justify-center mb-8">
+        <div id="auth-title" class="card-header text-2xl font-bold">Admin Access</div>
       </div>
 
-      <form id="email-form" class="space-y-4">
-        <div class="relative group">
-          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-500 text-slate-400">
+      <form id="email-form" class="space-y-5">
+        <div class="input-wrapper has-left-icon group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-500 text-slate-400 z-10">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
             </svg>
           </div>
-          <input type="password" id="password-input" placeholder="Enter Password" required class="w-full pl-11 pr-12 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all font-medium text-slate-700 placeholder-slate-400">
-
-          <button type="button" id="toggle-password-btn" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-600 transition-colors focus:outline-none">
+          <input type="password" id="password-input" placeholder=" " required class="input-field pl-11 pr-12 transition-all">
+          <label class="input-label">Enter Password</label>
+          <button type="button" id="toggle-password-btn" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-600 transition-colors focus:outline-none z-10">
             <svg id="eye-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -161,59 +272,50 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-          <div class="p-6">
-            <div class="flex flex-row items-center justify-between mb-6">
-              <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                <span class="w-2 h-6 bg-indigo-500 rounded-full"></span>History
-              </h2>
-              <button id="filter-btn" class="p-2 h-10 w-10 flex items-center justify-center bg-slate-100 focus:ring-2 focus:ring-indigo-500 rounded-full transition-all hover:bg-slate-200 text-slate-600 shrink-0" aria-label="Filter">
-                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
-                </svg>
-              </button>
-            </div>
-
-            <div class="relative w-full">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                </svg>
-              </div>
-              <input type="search" id="search-input" placeholder="Search Item..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 focus:bg-white focus:ring-1 focus:ring-indigo-500 focus:border-transparent rounded-xl text-sm transition-all outline-none text-slate-700 placeholder-slate-400">
-            </div>
+        <div class="mb-6">
+          <div class="flex flex-row items-center justify-between mb-4 px-1">
+            <h2 class="text-xl font-medium text-slate-800 tracking-tight">Recent Transactions</h2>
+            <button id="filter-btn" class="p-2 h-10 w-10 flex items-center justify-center bg-[#e2e8f0] focus:ring-2 focus:ring-indigo-500 rounded-full transition-all hover:bg-slate-300 text-slate-600 shrink-0" aria-label="Filter">
+              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+              </svg>
+            </button>
           </div>
 
-          <div id="filter-panel" class="overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0 px-6 bg-slate-50/50">
-            <div class="pb-2 pt-2 flex flex-col md:flex-row gap-4">
-              <div class="flex-1">
-                <div class="pb-2 flex flex-wrap gap-2">
-                  <button id="last-week" class="text-xs font-medium px-3 py-1.5 bg-white hover:bg-indigo-50 hover:text-indigo-600 border border-slate-200 rounded-lg transition-all shadow-sm">Last Week</button>
-                  <button id="last-month" class="text-xs font-medium px-3 py-1.5 bg-white hover:bg-indigo-50 hover:text-indigo-600 border border-slate-200 rounded-lg transition-all shadow-sm">Last Month</button>
-                  <button id="last-year" class="text-xs font-medium px-3 py-1.5 bg-white hover:bg-indigo-50 hover:text-indigo-600 border border-slate-200 rounded-lg transition-all shadow-sm">This Year</button>
+          <div id="filter-panel" class="overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0 mb-0">
+            <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm mb-4 space-y-5">
+              
+              <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                  </svg>
                 </div>
+                <input type="search" id="search-input" placeholder="Search item..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 focus:bg-white focus:ring-1 focus:ring-indigo-500 focus:border-transparent rounded-xl text-sm transition-all outline-none text-slate-700 placeholder-slate-400">
               </div>
-              <div class="flex-1">
-                <div class="flex gap-3 w-full max-w-sm">
-                  <div class="w-1/2">
-                    <label for="start-date-input" class="block text-xs font-medium mb-1 text-slate-600">From</label>
-                    <input id="start-date-input" type="date" class="text-sm form-input w-full bg-white border border-slate-200 focus:ring-1 focus:ring-indigo-500 focus:border-transparent rounded-lg px-2 py-1.5 transition-all outline-none shadow-sm">
-                  </div>
-                  <div class="w-1/2">
-                    <label for="end-date-input" class="block text-xs font-medium mb-1 text-slate-600">To</label>
-                    <input id="end-date-input" type="date" class="text-sm form-input w-full bg-white border border-slate-200 focus:ring-1 focus:ring-indigo-500 focus:border-transparent rounded-lg px-2 py-1.5 transition-all outline-none shadow-sm">
-                  </div>
+
+              <div class="flex flex-wrap gap-2">
+                <button id="last-week" class="text-xs font-medium px-4 py-2 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 border border-slate-200 rounded-lg transition-all">Last Week</button>
+                <button id="last-month" class="text-xs font-medium px-4 py-2 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 border border-slate-200 rounded-lg transition-all">Last Month</button>
+                <button id="last-year" class="text-xs font-medium px-4 py-2 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 border border-slate-200 rounded-lg transition-all">This Year</button>
+              </div>
+
+              <div class="flex gap-3">
+                <div class="w-1/2 relative">
+                  <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-semibold text-slate-400">From</label>
+                  <input id="start-date-input" type="date" class="w-full bg-slate-50 border border-slate-200 focus:ring-1 focus:ring-indigo-500 rounded-xl px-3 py-2.5 text-sm transition-all outline-none text-slate-600">
+                </div>
+                <div class="w-1/2 relative">
+                  <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-semibold text-slate-400">To</label>
+                  <input id="end-date-input" type="date" class="w-full bg-slate-50 border border-slate-200 focus:ring-1 focus:ring-indigo-500 rounded-xl px-3 py-2.5 text-sm transition-all outline-none text-slate-600">
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <tbody id="expense-list" class="divide-y divide-slate-100 text-sm"></tbody>
-            </table>
-            <button id="view-all" class="w-full bg-slate-200 text-slate-600 font-bold py-2 transition-all hover:bg-slate-100 active:bg-slate-400 border-t border-slate-100">View all</button>
-          </div>
+          <div id="expense-list" class="space-y-3"></div>
+          
+          <button id="view-all" class="w-full mt-4 bg-white text-slate-600 font-bold py-3 transition-all hover:bg-slate-50 active:bg-slate-200 rounded-2xl border border-slate-100 shadow-sm hidden">View all</button>
         </div>
       </div>
     </div>
@@ -238,91 +340,119 @@
   </main>
 
   <div id="add-modal" class="fixed inset-0 bg-transparent backdrop-blur-sm flex items-end justify-center z-50 hidden animate-fade-in">
-    <div class="modal-container animate-slide-up relative w-full md:max-w-md p-6 pb-6 border-t border-slate-400 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.15)] rounded-t-3xl bg-white mt-10">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-slate-800 pr-4">Add Expense</h3>
+    <div class="modal-container animate-slide-up relative w-full md:max-w-md config-card p-6 pb-6 mt-10 rounded-t-3xl md:rounded-3xl border-t md:border">
+      <div class="flex justify-between items-center mb-6">
+        <div class="card-header" style="margin:0;">Add Expense</div>
         <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
           </svg>
         </div>
       </div>
-      <form id="expense-form" class="space-y-3 text-left">
-        <input type="text" id="material-name" placeholder="Enter name" required class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-1 focus:ring-indigo-500 outline-none">
-        <div class="grid grid-cols-2 gap-3">
-          <input type="number" id="cost" placeholder="Enter amount" required step="0.01" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-1 focus:ring-indigo-500 outline-none">
-          <div class="relative">
-            <input id="date" type="date" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-1 focus:ring-indigo-500 outline-none">
-            <svg class="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <form id="expense-form" class="space-y-4 text-left">
+        <div class="input-wrapper mb-0">
+          <input type="text" id="material-name" placeholder=" " required class="input-field">
+          <label class="input-label">Enter name</label>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="input-wrapper mb-0">
+            <input type="number" id="cost" placeholder=" " required step="0.01" class="input-field">
+            <label class="input-label">Enter amount</label>
+          </div>
+          <div class="input-wrapper mb-0 relative">
+            <input id="date" type="date" placeholder=" " class="input-field pr-10">
+            <label class="input-label">Date</label>
+            <svg class="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none z-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div class="relative">
-            <select id="payment-status" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 pr-10 appearance-none focus:ring-1 focus:ring-indigo-500 outline-none">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="input-wrapper mb-0 relative">
+            <select id="payment-status" class="input-field pr-10 appearance-none">
               <option value="Paid">Paid</option>
               <option value="Unpaid">Unpaid</option>
             </select>
-            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <label class="input-label">Status</label>
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none z-10">
               <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </div>
           </div>
-          <input id="address" type="text" placeholder="Address" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+          <div class="input-wrapper mb-0">
+            <input id="address" type="text" placeholder=" " class="input-field">
+            <label class="input-label">Address</label>
+          </div>
         </div>
-        <input type="text" id="additional-info" placeholder="Extra details" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
-        <div class="flex gap-2 pt-2">
-          <button type="button" id="cancel-add-btn" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-lg font-medium hover:bg-slate-200 transition">Cancel</button>
-          <button type="submit" class="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 active:scale-95 transition">Add Entry</button>
+        <div class="input-wrapper mb-0">
+          <input type="text" id="additional-info" placeholder=" " class="input-field">
+          <label class="input-label">Extra details</label>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" id="cancel-add-btn" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition">Cancel</button>
+          <button type="submit" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 active:scale-95 transition">Add Entry</button>
         </div>
       </form>
     </div>
   </div>
 
   <div id="edit-modal" class="fixed inset-0 bg-transparent backdrop-blur-sm flex items-end justify-center z-50 hidden animate-fade-in">
-    <div class="modal-container animate-slide-up relative w-full md:max-w-md p-6 pb-6 border-t border-slate-400 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.15)] rounded-t-3xl bg-white mt-10">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-slate-800 pr-4">Edit Expense</h3>
+    <div class="modal-container animate-slide-up relative w-full md:max-w-md config-card p-6 pb-6 mt-10 rounded-t-3xl md:rounded-3xl border-t md:border">
+      <div class="flex justify-between items-center mb-6">
+        <div class="card-header" style="margin:0;">Edit Expense</div>
         <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
           </svg>
         </div>
       </div>
-      <form id="edit-expense-form" class="space-y-3 text-left">
+      <form id="edit-expense-form" class="space-y-4 text-left">
         <input type="hidden" id="edit-expense-id">
-        <input type="text" id="edit-material-name" placeholder="Item name" required class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 outline-none">
-        <div class="grid grid-cols-2 gap-3">
-          <input type="number" id="edit-cost" placeholder="Amount" required min="0" step="0.01" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 outline-none">
-          <div class="relative">
-            <input id="edit-date" type="date" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 pr-8 focus:ring-1 focus:ring-indigo-500 outline-none">
-            <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+        <div class="input-wrapper mb-0">
+          <input type="text" id="edit-material-name" placeholder=" " required class="input-field">
+          <label class="input-label">Item name</label>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="input-wrapper mb-0">
+            <input type="number" id="edit-cost" placeholder=" " required min="0" step="0.01" class="input-field">
+            <label class="input-label">Amount</label>
+          </div>
+          <div class="input-wrapper mb-0 relative">
+            <input id="edit-date" type="date" placeholder=" " class="input-field pr-10">
+            <label class="input-label">Date</label>
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none z-10">
               <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div class="relative">
-            <select id="edit-payment-status" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 pr-8 appearance-none">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="input-wrapper mb-0 relative">
+            <select id="edit-payment-status" class="input-field pr-10 appearance-none">
               <option value="Paid">Paid</option>
               <option value="Unpaid">Unpaid</option>
             </select>
-            <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+            <label class="input-label">Status</label>
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none z-10">
               <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </div>
           </div>
-          <input id="edit-address" type="text" placeholder="Address" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+          <div class="input-wrapper mb-0">
+            <input id="edit-address" type="text" placeholder=" " class="input-field">
+            <label class="input-label">Address</label>
+          </div>
         </div>
-        <input type="text" id="edit-additional-info" placeholder="Extra details" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
-        <div class="flex gap-2 pt-2">
-          <button type="button" id="cancel-edit-btn" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-lg font-medium hover:bg-slate-200 transition">Cancel</button>
-          <button type="submit" id="save-edit-btn" class="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition">Save</button>
+        <div class="input-wrapper mb-0">
+          <input type="text" id="edit-additional-info" placeholder=" " class="input-field">
+          <label class="input-label">Extra details</label>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" id="cancel-edit-btn" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition">Cancel</button>
+          <button type="submit" id="save-edit-btn" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition">Save</button>
         </div>
       </form>
     </div>
@@ -416,13 +546,13 @@
     filterBtn?.addEventListener('click', () => {
       const isClosed = filterPanel.classList.contains('max-h-0');
       if (isClosed) {
-        filterPanel.classList.remove('max-h-0', 'opacity-0');
-        filterPanel.classList.add('max-h-96', 'opacity-100');
-        filterBtn.classList.add('bg-slate-200');
+        filterPanel.classList.remove('max-h-0', 'opacity-0', 'mb-0');
+        filterPanel.classList.add('max-h-96', 'opacity-100', 'mb-4');
+        filterBtn.classList.add('bg-slate-300');
       } else {
-        filterPanel.classList.add('max-h-0', 'opacity-0');
-        filterPanel.classList.remove('max-h-96', 'opacity-100');
-        filterBtn.classList.remove('bg-slate-200');
+        filterPanel.classList.add('max-h-0', 'opacity-0', 'mb-0');
+        filterPanel.classList.remove('max-h-96', 'opacity-100', 'mb-4');
+        filterBtn.classList.remove('bg-slate-300');
       }
     });
 
@@ -621,7 +751,7 @@
     viewAllBtn?.addEventListener('click', () => {
       showAllExpenses = true;
       applyFilters();
-      if (viewAllBtn) viewAllBtn.style.display = 'none';
+      if (viewAllBtn) { viewAllBtn.classList.add('hidden'); viewAllBtn.style.display = 'none'; }
     });
 
     // Single Project Expenses
@@ -665,9 +795,9 @@
       }
 
       if (!isFiltering && !showAllExpenses && allExpensesForProject.length > 5) {
-        if (viewAllBtn) viewAllBtn.style.display = 'block';
+        if (viewAllBtn) { viewAllBtn.classList.remove('hidden'); viewAllBtn.style.display = ''; }
       } else {
-        if (viewAllBtn) viewAllBtn.style.display = 'none';
+        if (viewAllBtn) { viewAllBtn.classList.add('hidden'); viewAllBtn.style.display = 'none'; }
       }
       renderExpenses(filtered);
     };
@@ -749,35 +879,51 @@
     function renderExpenses(expenses) {
       if (!expenseList) return;
       if (expenses.length === 0) {
-        expenseList.innerHTML = `<tr><td colspan="4" class="text-center py-3 text-gray-500">No expenses found.</td></tr>`;
+        expenseList.innerHTML = `<div class="text-center py-8 text-slate-500 bg-white rounded-2xl border border-slate-100 shadow-sm">No transactions found.</div>`;
         return;
       }
-      expenseList.innerHTML = expenses.map(expense => `
-        <tr>
-        <td>
-        <div class="px-4 py-3">
-        <div class="flex justify-between items-start gap-2">
-        <div>
-        <div class="font-semibold text-base">${escapeHTML(expense.material)}</div>
-        ${expense.address ? `<div class="text-sm text-slate-500 mt-0.5">${escapeHTML(expense.address)}</div>`: ''}
-        </div>
-        <div class="${(expense.paymentStatus || '').toLowerCase() == 'paid' ? 'status-paid text-green-600': 'status-unpaid text-red-600'} font-semibold text-sm px-2 py-1 whitespace-nowrap">${escapeHTML(expense.paymentStatus || 'Unpaid')}</div>
-        </div>
-        <div class="font-bold text-base mt-2">₹${expense.cost.toLocaleString('en-IN')}</div>
-        ${expense.additionalInfo ? `<div class="mt-2"><div class="text-xs text-slate-400">Additional Information</div><div class="text-sm">${escapeHTML(expense.additionalInfo)}</div></div>`: ''}
-        <div class="flex justify-between items-center mt-2">
-        <div class="text-sm text-slate-500">${new Date(expense.date).toLocaleDateString('en-IN', {
-          timeZone: 'UTC', day: 'numeric', month: 'short', year: 'numeric'
-        })}</div>
-        <div class="flex gap-6 text-sm">
-        <button data-id="${expense.id}" class="edit-btn text-indigo-600">Edit</button>
-        <button data-id="${expense.id}" class="delete-btn text-red-600">Delete</button>
-        </div>
-        </div>
-        </div>
-        </td>
-        </tr>
-        `).join('');
+      expenseList.innerHTML = expenses.map(expense => {
+        const isPaid = (expense.paymentStatus || '').toLowerCase() === 'paid';
+        
+        // Icon block styling based on status (no border)
+        const iconBg = isPaid ? 'bg-green-50' : 'bg-red-50';
+        const iconColor = isPaid ? 'text-green-500' : 'text-red-500';
+        
+        const svgPath = isPaid 
+          ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />' // Tick mark
+          : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />'; // Cross mark
+        
+        const formattedDate = new Date(expense.date).toLocaleDateString('en-GB', {
+          timeZone: 'UTC', day: '2-digit', month: 'short', year: 'numeric'
+        });
+
+        return `
+          <div class="bg-white rounded-2xl p-4 flex items-center justify-between shadow-sm border border-slate-100 transition-all">
+            <div class="flex items-center gap-4 flex-1 min-w-0">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center ${iconBg} ${iconColor} shrink-0">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  ${svgPath}
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0 pr-2">
+                <h4 class="text-base font-medium text-slate-800 leading-tight mb-1 truncate">${escapeHTML(expense.material)}</h4>
+                <p class="text-sm text-slate-500 leading-tight">${formattedDate}</p>
+                ${expense.address ? `<p class="text-xs text-slate-500 mt-1 truncate">${escapeHTML(expense.address)}</p>` : ''}
+                ${expense.additionalInfo ? `<p class="text-xs text-slate-400 mt-0.5 truncate">${escapeHTML(expense.additionalInfo)}</p>` : ''}
+              </div>
+            </div>
+            <div class="flex flex-col items-end justify-between h-full min-h-[48px] shrink-0">
+              <div class="font-medium text-slate-800 text-base tracking-tight mb-2">
+                ${isPaid ? '' : '-'}₹${expense.cost.toLocaleString('en-IN')}
+              </div>
+              <div class="flex gap-3 text-sm font-medium mt-auto">
+                <button data-id="${expense.id}" class="edit-btn text-indigo-600 hover:text-indigo-800 transition-colors">Edit</button>
+                <button data-id="${expense.id}" class="delete-btn text-red-600 hover:text-red-800 transition-colors">Delete</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
 
       document.querySelectorAll('.delete-btn').forEach(b => b.addEventListener('click', handleDelete));
       document.querySelectorAll('.edit-btn').forEach(b => b.addEventListener('click', handleEdit));
