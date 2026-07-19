@@ -1,17 +1,15 @@
 # Cricket Score Broadcast Suite
 
-A minimalist web application for live cricket scoring and broadcasting.
+A minimal, web-based broadcast suite for live cricket scoring, statistics, and OBS integration.
+
+ðŸš€ **[Live Preview](#)** *(Replace '#' with your actual live link)*
 
 ## Modules
 
-* **`score.html`** - For entering scores.
-* **`view.html`** - View scores and statistics.
-* **`live.html`** - Transparent live feed output (OBS ready).
-* **`broadcast.html`** - Control scenes and custom graphics.
-
-## Usage
-
-Simply open `index.html` in any modern web browser to access the module selection dashboard.
+- **Scoring** (`score.html`) - For entering scores
+- **View & Stats** (`view.html`) - View scores and statistics
+- **OBS Output** (`live.html`) - Transparent live feed
+- **Control** (`broadcast.html`) - Scenes & custom graphics
 
 ---
 *Designed by Roni*
